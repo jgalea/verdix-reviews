@@ -1,153 +1,147 @@
 <?php
-/**
- * Admin menu, settings registration, and post list integration.
- *
- * @package ScoreBox
- */
-
 defined( 'ABSPATH' ) || exit;
 
 // =========================================================================
 // Top-level admin menu
 // =========================================================================
 
-function scorebox_admin_menu() {
+function verdix_admin_menu() {
 	// Main menu page — shows the dashboard/overview.
 	add_menu_page(
-		__( 'ScoreBox', 'scorebox' ),
-		__( 'ScoreBox', 'scorebox' ),
+		__( 'Verdix Reviews', 'verdix-reviews' ),
+		__( 'Verdix Reviews', 'verdix-reviews' ),
 		'manage_options',
-		'scorebox',
-		'scorebox_dashboard_page',
+		'verdix-reviews',
+		'verdix_dashboard_page',
 		'dashicons-star-filled',
 		30
 	);
 
 	// Settings submenu.
 	add_submenu_page(
-		'scorebox',
-		__( 'Settings', 'scorebox' ),
-		__( 'Settings', 'scorebox' ),
+		'verdix-reviews',
+		__( 'Settings', 'verdix-reviews' ),
+		__( 'Settings', 'verdix-reviews' ),
 		'manage_options',
-		'scorebox-settings',
-		'scorebox_settings_page'
+		'verdix-settings',
+		'verdix_settings_page'
 	);
 
 	// Migration submenu.
 	add_submenu_page(
-		'scorebox',
-		__( 'Migration', 'scorebox' ),
-		__( 'Migration', 'scorebox' ),
+		'verdix-reviews',
+		__( 'Migration', 'verdix-reviews' ),
+		__( 'Migration', 'verdix-reviews' ),
 		'manage_options',
-		'scorebox-migration',
-		'scorebox_migration_page'
+		'verdix-migration',
+		'verdix_migration_page'
 	);
 
-	// Rename the auto-created first submenu from "ScoreBox" to "Dashboard".
+	// Rename the auto-created first submenu from "Verdix Reviews" to "Dashboard".
 	global $submenu;
-	if ( isset( $submenu['scorebox'] ) ) {
-		$submenu['scorebox'][0][0] = __( 'Dashboard', 'scorebox' );
+	if ( isset( $submenu['verdix-reviews'] ) ) {
+		$submenu['verdix-reviews'][0][0] = __( 'Dashboard', 'verdix-reviews' );
 	}
 }
-add_action( 'admin_menu', 'scorebox_admin_menu' );
+add_action( 'admin_menu', 'verdix_admin_menu' );
 
 // =========================================================================
 // Settings registration
 // =========================================================================
 
-function scorebox_register_settings() {
+function verdix_register_settings() {
 	register_setting(
-		'scorebox_settings_group',
-		'scorebox_settings',
+		'verdix_settings_group',
+		'verdix_settings',
 		array(
 			'type'              => 'array',
-			'sanitize_callback' => 'scorebox_sanitize_settings',
+			'sanitize_callback' => 'verdix_sanitize_settings',
 			'default'           => array(),
 		)
 	);
 
 	// General section.
 	add_settings_section(
-		'scorebox_general',
+		'verdix_general',
 		'',
 		'__return_null',
-		'scorebox-settings'
+		'verdix-settings'
 	);
 
 	add_settings_field(
 		'default_schema_type',
-		__( 'Default Schema Type', 'scorebox' ),
-		'scorebox_field_schema_type',
-		'scorebox-settings',
-		'scorebox_general'
+		__( 'Default Schema Type', 'verdix-reviews' ),
+		'verdix_field_schema_type',
+		'verdix-settings',
+		'verdix_general'
 	);
 
 	add_settings_field(
 		'default_author_name',
-		__( 'Default Author Name', 'scorebox' ),
-		'scorebox_field_author_name',
-		'scorebox-settings',
-		'scorebox_general'
+		__( 'Default Author Name', 'verdix-reviews' ),
+		'verdix_field_author_name',
+		'verdix-settings',
+		'verdix_general'
 	);
 
 	add_settings_field(
 		'default_position',
-		__( 'Default Review Position', 'scorebox' ),
-		'scorebox_field_position',
-		'scorebox-settings',
-		'scorebox_general'
+		__( 'Default Review Position', 'verdix-reviews' ),
+		'verdix_field_position',
+		'verdix-settings',
+		'verdix_general'
 	);
 
 	// Appearance section.
 	add_settings_section(
-		'scorebox_appearance',
+		'verdix_appearance',
 		'',
 		'__return_null',
-		'scorebox-settings-appearance'
+		'verdix-settings-appearance'
 	);
 
 	add_settings_field(
 		'default_style',
-		__( 'Review Box Style', 'scorebox' ),
-		'scorebox_field_default_style',
-		'scorebox-settings-appearance',
-		'scorebox_appearance'
+		__( 'Review Box Style', 'verdix-reviews' ),
+		'verdix_field_default_style',
+		'verdix-settings-appearance',
+		'verdix_appearance'
 	);
 
 	add_settings_field(
 		'accent_color',
-		__( 'Star / Accent Color', 'scorebox' ),
-		'scorebox_field_accent_color',
-		'scorebox-settings-appearance',
-		'scorebox_appearance'
+		__( 'Star / Accent Color', 'verdix-reviews' ),
+		'verdix_field_accent_color',
+		'verdix-settings-appearance',
+		'verdix_appearance'
 	);
 
 	add_settings_field(
 		'bg_color',
-		__( 'Background Color', 'scorebox' ),
-		'scorebox_field_bg_color',
-		'scorebox-settings-appearance',
-		'scorebox_appearance'
+		__( 'Background Color', 'verdix-reviews' ),
+		'verdix_field_bg_color',
+		'verdix-settings-appearance',
+		'verdix_appearance'
 	);
 
 	add_settings_field(
 		'border_color',
-		__( 'Border Color', 'scorebox' ),
-		'scorebox_field_border_color',
-		'scorebox-settings-appearance',
-		'scorebox_appearance'
+		__( 'Border Color', 'verdix-reviews' ),
+		'verdix_field_border_color',
+		'verdix-settings-appearance',
+		'verdix_appearance'
 	);
 }
-add_action( 'admin_init', 'scorebox_register_settings' );
+add_action( 'admin_init', 'verdix_register_settings' );
 
 // =========================================================================
 // Sanitize
 // =========================================================================
 
-function scorebox_sanitize_settings( $input ) {
+function verdix_sanitize_settings( $input ) {
 	$output = array();
 
-	$valid_types = array_keys( scorebox_get_schema_types() );
+	$valid_types = array_keys( verdix_get_schema_types() );
 	$output['default_schema_type'] = 'Product';
 	if ( isset( $input['default_schema_type'] ) && in_array( $input['default_schema_type'], $valid_types, true ) ) {
 		$output['default_schema_type'] = $input['default_schema_type'];
@@ -164,7 +158,7 @@ function scorebox_sanitize_settings( $input ) {
 		$output['default_position'] = $input['default_position'];
 	}
 
-	$valid_styles = array( 'default', 'card', 'hero', 'split', 'minimal' );
+	$valid_styles            = array_keys( verdix_get_styles() );
 	$output['default_style'] = 'default';
 	if ( isset( $input['default_style'] ) && in_array( $input['default_style'], $valid_styles, true ) ) {
 		$output['default_style'] = $input['default_style'];
@@ -197,100 +191,100 @@ function scorebox_sanitize_settings( $input ) {
 // Page render callbacks
 // =========================================================================
 
-function scorebox_dashboard_page() {
+function verdix_dashboard_page() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
-	include SCOREBOX_DIR . 'admin/views/dashboard-page.php';
+	include VERDIX_DIR . 'admin/views/dashboard-page.php';
 }
 
-function scorebox_settings_page() {
+function verdix_settings_page() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
-	include SCOREBOX_DIR . 'admin/views/settings-page.php';
+	include VERDIX_DIR . 'admin/views/settings-page.php';
 }
 
 // =========================================================================
 // Field callbacks
 // =========================================================================
 
-function scorebox_field_schema_type() {
-	$options = get_option( 'scorebox_settings', array() );
+function verdix_field_schema_type() {
+	$options = get_option( 'verdix_settings', array() );
 	$current = isset( $options['default_schema_type'] ) ? $options['default_schema_type'] : 'Product';
 	?>
-	<select name="scorebox_settings[default_schema_type]" id="scorebox_default_schema_type">
-		<?php foreach ( scorebox_get_schema_types() as $type_value => $type_label ) : ?>
+	<select name="verdix_settings[default_schema_type]" id="verdix_default_schema_type">
+		<?php foreach ( verdix_get_schema_types() as $type_value => $type_label ) : ?>
 			<option value="<?php echo esc_attr( $type_value ); ?>" <?php selected( $current, $type_value ); ?>><?php echo esc_html( $type_label ); ?></option>
 		<?php endforeach; ?>
 	</select>
-	<p class="description"><?php esc_html_e( 'Default schema.org type for new reviews. Can be overridden per post.', 'scorebox' ); ?></p>
+	<p class="description"><?php esc_html_e( 'Default schema.org type for new reviews. Can be overridden per post.', 'verdix-reviews' ); ?></p>
 	<?php
 }
 
-function scorebox_field_author_name() {
-	$options = get_option( 'scorebox_settings', array() );
+function verdix_field_author_name() {
+	$options = get_option( 'verdix_settings', array() );
 	$value   = isset( $options['default_author_name'] ) ? $options['default_author_name'] : '';
 	?>
-	<input type="text" name="scorebox_settings[default_author_name]" id="scorebox_default_author_name"
+	<input type="text" name="verdix_settings[default_author_name]" id="verdix_default_author_name"
 		value="<?php echo esc_attr( $value ); ?>" class="regular-text"
-		placeholder="<?php esc_attr_e( 'e.g., John Smith', 'scorebox' ); ?>">
-	<p class="description"><?php esc_html_e( 'Used in JSON-LD schema as review author. Falls back to post author if empty.', 'scorebox' ); ?></p>
+		placeholder="<?php esc_attr_e( 'e.g., John Smith', 'verdix-reviews' ); ?>">
+	<p class="description"><?php esc_html_e( 'Used in JSON-LD schema as review author. Falls back to post author if empty.', 'verdix-reviews' ); ?></p>
 	<?php
 }
 
-function scorebox_field_position() {
-	$options = get_option( 'scorebox_settings', array() );
+function verdix_field_position() {
+	$options = get_option( 'verdix_settings', array() );
 	$current = isset( $options['default_position'] ) ? $options['default_position'] : 'manual';
 	?>
-	<select name="scorebox_settings[default_position]" id="scorebox_default_position">
-		<option value="manual" <?php selected( $current, 'manual' ); ?>><?php esc_html_e( 'Manual (block/shortcode only)', 'scorebox' ); ?></option>
-		<option value="bottom" <?php selected( $current, 'bottom' ); ?>><?php esc_html_e( 'After content', 'scorebox' ); ?></option>
-		<option value="top" <?php selected( $current, 'top' ); ?>><?php esc_html_e( 'Before content', 'scorebox' ); ?></option>
-		<option value="both" <?php selected( $current, 'both' ); ?>><?php esc_html_e( 'Before and after content', 'scorebox' ); ?></option>
+	<select name="verdix_settings[default_position]" id="verdix_default_position">
+		<option value="manual" <?php selected( $current, 'manual' ); ?>><?php esc_html_e( 'Manual (block/shortcode only)', 'verdix-reviews' ); ?></option>
+		<option value="bottom" <?php selected( $current, 'bottom' ); ?>><?php esc_html_e( 'After content', 'verdix-reviews' ); ?></option>
+		<option value="top" <?php selected( $current, 'top' ); ?>><?php esc_html_e( 'Before content', 'verdix-reviews' ); ?></option>
+		<option value="both" <?php selected( $current, 'both' ); ?>><?php esc_html_e( 'Before and after content', 'verdix-reviews' ); ?></option>
 	</select>
-	<p class="description"><?php esc_html_e( 'Where to auto-insert the review box. Can be overridden per post.', 'scorebox' ); ?></p>
+	<p class="description"><?php esc_html_e( 'Where to auto-insert the review box. Can be overridden per post.', 'verdix-reviews' ); ?></p>
 	<?php
 }
 
-function scorebox_field_accent_color() {
-	$options = get_option( 'scorebox_settings', array() );
+function verdix_field_accent_color() {
+	$options = get_option( 'verdix_settings', array() );
 	$value   = isset( $options['accent_color'] ) ? $options['accent_color'] : '#1e73be';
 	?>
-	<input type="text" name="scorebox_settings[accent_color]" id="scorebox_accent_color"
-		value="<?php echo esc_attr( $value ); ?>" class="scorebox-color-picker" data-default-color="#1e73be">
+	<input type="text" name="verdix_settings[accent_color]" id="verdix_accent_color"
+		value="<?php echo esc_attr( $value ); ?>" class="verdix-color-picker" data-default-color="#1e73be">
 	<?php
 }
 
-function scorebox_field_bg_color() {
-	$options = get_option( 'scorebox_settings', array() );
+function verdix_field_bg_color() {
+	$options = get_option( 'verdix_settings', array() );
 	$value   = isset( $options['bg_color'] ) ? $options['bg_color'] : '#fff';
 	?>
-	<input type="text" name="scorebox_settings[bg_color]" id="scorebox_bg_color"
-		value="<?php echo esc_attr( $value ); ?>" class="scorebox-color-picker" data-default-color="#ffffff">
+	<input type="text" name="verdix_settings[bg_color]" id="verdix_bg_color"
+		value="<?php echo esc_attr( $value ); ?>" class="verdix-color-picker" data-default-color="#ffffff">
 	<?php
 }
 
-function scorebox_field_border_color() {
-	$options = get_option( 'scorebox_settings', array() );
+function verdix_field_border_color() {
+	$options = get_option( 'verdix_settings', array() );
 	$value   = isset( $options['border_color'] ) ? $options['border_color'] : '#e7e7e7';
 	?>
-	<input type="text" name="scorebox_settings[border_color]" id="scorebox_border_color"
-		value="<?php echo esc_attr( $value ); ?>" class="scorebox-color-picker" data-default-color="#e7e7e7">
+	<input type="text" name="verdix_settings[border_color]" id="verdix_border_color"
+		value="<?php echo esc_attr( $value ); ?>" class="verdix-color-picker" data-default-color="#e7e7e7">
 	<?php
 }
 
-function scorebox_field_default_style() {
-	$options = get_option( 'scorebox_settings', array() );
+function verdix_field_default_style() {
+	$options = get_option( 'verdix_settings', array() );
 	$current = isset( $options['default_style'] ) ? $options['default_style'] : 'default';
-	$styles  = scorebox_get_styles();
+	$styles  = verdix_get_styles();
 	?>
-	<select name="scorebox_settings[default_style]" id="scorebox_default_style">
+	<select name="verdix_settings[default_style]" id="verdix_default_style">
 		<?php foreach ( $styles as $value => $config ) : ?>
 			<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $current, $value ); ?>><?php echo esc_html( $config['label'] ); ?></option>
 		<?php endforeach; ?>
 	</select>
-	<p class="description"><?php esc_html_e( 'Default style for new reviews.', 'scorebox' ); ?></p>
+	<p class="description"><?php esc_html_e( 'Default style for new reviews.', 'verdix-reviews' ); ?></p>
 	<?php
 }
 
@@ -301,49 +295,46 @@ function scorebox_field_default_style() {
 /**
  * Sample review used for the appearance preview.
  */
-function scorebox_get_preview_review() {
+function verdix_get_preview_review() {
 	$review = array(
 		'rating'       => 4.5,
 		'rating_type'  => 'star',
-		'heading'      => __( 'Our Verdict', 'scorebox' ),
-		'summary'      => __( 'An excellent product that delivers on its promises. Great value for the price.', 'scorebox' ),
+		'heading'      => __( 'Our Verdict', 'verdix-reviews' ),
+		'summary'      => __( 'An excellent product that delivers on its promises. Great value for the price.', 'verdix-reviews' ),
 		'pros'         => array(
-			__( 'Easy to use', 'scorebox' ),
-			__( 'Great performance', 'scorebox' ),
-			__( 'Good value', 'scorebox' ),
+			__( 'Easy to use', 'verdix-reviews' ),
+			__( 'Great performance', 'verdix-reviews' ),
+			__( 'Good value', 'verdix-reviews' ),
 		),
 		'cons'         => array(
-			__( 'Limited options', 'scorebox' ),
-			__( 'Could be cheaper', 'scorebox' ),
+			__( 'Limited options', 'verdix-reviews' ),
+			__( 'Could be cheaper', 'verdix-reviews' ),
 		),
-		'cta_text'     => __( 'Visit Website', 'scorebox' ),
+		'cta_text'     => __( 'Visit Website', 'verdix-reviews' ),
 		'cta_url'      => '#',
-		'product_name' => __( 'Example Product', 'scorebox' ),
+		'product_name' => __( 'Example Product', 'verdix-reviews' ),
 		'style'        => '',
 		'position'     => '',
 		'schema_type'  => 'Product',
 		'price'        => '',
 		'currency'     => 'USD',
 		'author_name'  => '',
-		'use_criteria' => false,
-		'criteria'     => array(),
 	);
 
 	/**
-	 * Filter the sample review used on the Appearance preview. Pro add-ons
-	 * hook in to enable criteria, visitor ratings, etc. on the preview.
+	 * Filter the sample review used on the Appearance preview.
 	 *
 	 * @param array $review Sample review data.
 	 */
-	return apply_filters( 'scorebox_preview_review', $review );
+	return apply_filters( 'verdix_preview_review', $review );
 }
 
 /**
  * AJAX: render the appearance preview with the provided style + colors,
  * without persisting any settings.
  */
-function scorebox_ajax_render_preview() {
-	check_ajax_referer( 'scorebox_preview', 'nonce' );
+function verdix_ajax_render_preview() {
+	check_ajax_referer( 'verdix_preview', 'nonce' );
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_send_json_error( array( 'message' => 'forbidden' ), 403 );
 	}
@@ -366,106 +357,98 @@ function scorebox_ajax_render_preview() {
 		}
 		return $value;
 	};
-	add_filter( 'option_scorebox_settings', $override );
+	add_filter( 'option_verdix_settings', $override );
 
-	$review          = scorebox_get_preview_review();
+	$review          = verdix_get_preview_review();
 	$review['style'] = $style;
 
-	$html = scorebox_render_box( $review, 0 );
+	$html = verdix_render_box( $review, 0 );
 
-	remove_filter( 'option_scorebox_settings', $override );
+	remove_filter( 'option_verdix_settings', $override );
 
 	wp_send_json_success( array( 'html' => $html ) );
 }
-add_action( 'wp_ajax_scorebox_render_preview', 'scorebox_ajax_render_preview' );
+add_action( 'wp_ajax_verdix_render_preview', 'verdix_ajax_render_preview' );
 
 // =========================================================================
 // Post list table — Rating column
 // =========================================================================
 
-function scorebox_add_post_columns( $columns ) {
+function verdix_add_post_columns( $columns ) {
 	$new = array();
 	foreach ( $columns as $key => $label ) {
 		$new[ $key ] = $label;
 		if ( 'title' === $key ) {
-			$new['scorebox_rating'] = __( 'Rating', 'scorebox' );
+			$new['verdix_rating'] = __( 'Rating', 'verdix-reviews' );
 		}
 	}
 	return $new;
 }
 
-function scorebox_render_post_column( $column, $post_id ) {
-	if ( 'scorebox_rating' !== $column ) {
+function verdix_render_post_column( $column, $post_id ) {
+	if ( 'verdix_rating' !== $column ) {
 		return;
 	}
 
-	$review = scorebox_get_review( $post_id );
+	$review = verdix_get_review( $post_id );
 	if ( ! $review || empty( $review['rating'] ) ) {
-		echo '<span class="scorebox-col-empty">&mdash;</span>';
+		echo '<span class="verdix-col-empty">&mdash;</span>';
 		return;
 	}
 
-	$rating      = $review['rating'];
-	$rating_type = ! empty( $review['rating_type'] ) ? $review['rating_type'] : 'star';
-
-	switch ( $rating_type ) {
-		case 'percentage':
-			$display = round( $rating ) . '%';
-			break;
-		case 'point':
-			$display = $rating . '/10';
-			break;
-		default:
-			$display = $rating . '/5';
-			break;
-	}
+	$rating       = $review['rating'];
+	$rating_type  = ! empty( $review['rating_type'] ) ? $review['rating_type'] : 'star';
+	$rating_types = verdix_get_rating_types();
+	$type_def     = isset( $rating_types[ $rating_type ] ) ? $rating_types[ $rating_type ] : $rating_types['star'];
+	$format       = isset( $type_def['format'] ) ? $type_def['format'] : '%s/5';
+	$display      = sprintf( $format, $rating );
 
 	$stars_html = '';
 	if ( 'star' === $rating_type ) {
-		$full = floor( $rating );
-		$half = ( $rating - $full ) >= 0.5 ? 1 : 0;
-		$stars_html .= str_repeat( '<span class="scorebox-col-star scorebox-col-star--full"></span>', $full );
+		$full        = floor( $rating );
+		$half        = ( $rating - $full ) >= 0.5 ? 1 : 0;
+		$stars_html .= str_repeat( '<span class="verdix-col-star verdix-col-star--full"></span>', $full );
 		if ( $half ) {
-			$stars_html .= '<span class="scorebox-col-star scorebox-col-star--half"></span>';
+			$stars_html .= '<span class="verdix-col-star verdix-col-star--half"></span>';
 		}
-		$stars_html .= str_repeat( '<span class="scorebox-col-star scorebox-col-star--empty"></span>', 5 - $full - $half );
+		$stars_html .= str_repeat( '<span class="verdix-col-star verdix-col-star--empty"></span>', 5 - $full - $half );
 	}
 
 	printf(
-		'<span class="scorebox-col-rating" title="%s">%s<strong>%s</strong></span>',
+		'<span class="verdix-col-rating" title="%s">%s<strong>%s</strong></span>',
 		esc_attr( $display ),
 		$stars_html, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static HTML.
 		esc_html( $display )
 	);
 }
 
-function scorebox_sortable_columns( $columns ) {
-	$columns['scorebox_rating'] = 'scorebox_rating';
+function verdix_sortable_columns( $columns ) {
+	$columns['verdix_rating'] = 'verdix_rating';
 	return $columns;
 }
 
-function scorebox_column_orderby( $query ) {
+function verdix_column_orderby( $query ) {
 	if ( ! is_admin() || ! $query->is_main_query() ) {
 		return;
 	}
 
-	if ( 'scorebox_rating' !== $query->get( 'orderby' ) ) {
+	if ( 'verdix_rating' !== $query->get( 'orderby' ) ) {
 		return;
 	}
 
-	// Sort by the numeric _scorebox_rating_sort companion meta (0-5 normalized).
+	// Sort by the numeric _verdix_rating_sort companion meta (0-5 normalized).
 	// Posts without a review are excluded — this is the expected behavior when the
 	// user explicitly asked to sort by rating.
-	$query->set( 'meta_key', '_scorebox_rating_sort' );
+	$query->set( 'meta_key', '_verdix_rating_sort' );
 	$query->set( 'orderby', 'meta_value_num' );
 }
 
 /**
- * One-shot backfill: populate _scorebox_rating_sort for existing reviews that
+ * One-shot backfill: populate _verdix_rating_sort for existing reviews that
  * were saved before this companion meta was introduced.
  */
-function scorebox_maybe_backfill_rating_sort() {
-	if ( get_option( 'scorebox_rating_sort_backfilled' ) ) {
+function verdix_maybe_backfill_rating_sort() {
+	if ( get_option( 'verdix_rating_sort_backfilled' ) ) {
 		return;
 	}
 	if ( ! is_admin() || ! current_user_can( 'manage_options' ) ) {
@@ -480,82 +463,82 @@ function scorebox_maybe_backfill_rating_sort() {
 			FROM {$wpdb->postmeta} pm
 			LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = pm.post_id AND pm2.meta_key = %s
 			WHERE pm.meta_key = %s AND pm.meta_value != %s AND pm2.meta_id IS NULL",
-			'_scorebox_rating_sort',
-			'_scorebox_review',
+			'_verdix_rating_sort',
+			'_verdix_review',
 			''
 		)
 	);
 
 	foreach ( $post_ids as $pid ) {
-		$review = scorebox_get_review( (int) $pid );
+		$review = verdix_get_review( (int) $pid );
 		if ( ! $review ) {
 			continue;
 		}
 		$rating_type = ! empty( $review['rating_type'] ) ? $review['rating_type'] : 'star';
-		$sort_val    = scorebox_normalize_to_star_scale( $review['rating'], $rating_type );
-		update_post_meta( (int) $pid, '_scorebox_rating_sort', $sort_val );
+		$sort_val    = verdix_normalize_to_star_scale( $review['rating'], $rating_type );
+		update_post_meta( (int) $pid, '_verdix_rating_sort', $sort_val );
 	}
 
-	update_option( 'scorebox_rating_sort_backfilled', 1 );
+	update_option( 'verdix_rating_sort_backfilled', 1 );
 }
-add_action( 'admin_init', 'scorebox_maybe_backfill_rating_sort' );
+add_action( 'admin_init', 'verdix_maybe_backfill_rating_sort' );
 
-function scorebox_register_post_columns() {
-	$options    = get_option( 'scorebox_settings', array() );
-	$post_types = apply_filters( 'scorebox_post_types', isset( $options['post_types'] ) ? $options['post_types'] : array( 'post', 'page' ) );
+function verdix_register_post_columns() {
+	$options    = get_option( 'verdix_settings', array() );
+	$post_types = apply_filters( 'verdix_post_types', isset( $options['post_types'] ) ? $options['post_types'] : array( 'post', 'page' ) );
 
 	foreach ( $post_types as $post_type ) {
-		add_filter( "manage_{$post_type}_posts_columns", 'scorebox_add_post_columns' );
-		add_action( "manage_{$post_type}_posts_custom_column", 'scorebox_render_post_column', 10, 2 );
-		add_filter( "manage_edit-{$post_type}_sortable_columns", 'scorebox_sortable_columns' );
+		add_filter( "manage_{$post_type}_posts_columns", 'verdix_add_post_columns' );
+		add_action( "manage_{$post_type}_posts_custom_column", 'verdix_render_post_column', 10, 2 );
+		add_filter( "manage_edit-{$post_type}_sortable_columns", 'verdix_sortable_columns' );
 	}
 }
-add_action( 'admin_init', 'scorebox_register_post_columns' );
-add_action( 'pre_get_posts', 'scorebox_column_orderby' );
+add_action( 'admin_init', 'verdix_register_post_columns' );
+add_action( 'pre_get_posts', 'verdix_column_orderby' );
 
 // =========================================================================
 // Admin assets
 // =========================================================================
 
-function scorebox_admin_enqueue( $hook_suffix ) {
-	// Admin CSS on all ScoreBox pages.
-	$scorebox_pages = array(
-		'toplevel_page_scorebox',
-		'scorebox_page_scorebox-settings',
-		'scorebox_page_scorebox-migration',
+function verdix_admin_enqueue( $hook_suffix ) {
+	// Admin CSS on all Verdix Reviews pages.
+	$verdix_pages = array(
+		'toplevel_page_verdix-reviews',
+		'verdix_page_verdix-settings',
+		'verdix_page_verdix-migration',
 	);
 
-	if ( in_array( $hook_suffix, $scorebox_pages, true ) ) {
+	if ( in_array( $hook_suffix, $verdix_pages, true ) ) {
 		wp_enqueue_style(
-			'scorebox-admin',
-			SCOREBOX_URL . 'assets/css/admin.css',
+			'verdix-admin',
+			VERDIX_URL . 'assets/css/admin.css',
 			array(),
-			SCOREBOX_VERSION
+			VERDIX_VERSION
 		);
 	}
 
 	// Color picker + frontend preview styles on settings page.
-	if ( 'scorebox_page_scorebox-settings' === $hook_suffix ) {
+	if ( 'verdix_page_verdix-settings' === $hook_suffix ) {
 		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_style(
-			'scorebox-frontend',
-			SCOREBOX_URL . 'assets/css/review-box.css',
+			'verdix-frontend',
+			VERDIX_URL . 'assets/css/review-box.css',
 			array(),
-			SCOREBOX_VERSION
+			VERDIX_VERSION
 		);
 		wp_enqueue_script(
-			'scorebox-admin-settings',
-			SCOREBOX_URL . 'assets/js/admin-settings.js',
+			'verdix-admin-settings',
+			VERDIX_URL . 'assets/js/admin-settings.js',
 			array( 'wp-color-picker', 'jquery' ),
-			SCOREBOX_VERSION,
+			VERDIX_VERSION,
 			true
 		);
 		wp_localize_script(
-			'scorebox-admin-settings',
-			'scoreboxPreview',
+			'verdix-admin-settings',
+			'verdixPreview',
 			array(
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-				'nonce'   => wp_create_nonce( 'scorebox_preview' ),
+				'nonce'   => wp_create_nonce( 'verdix_preview' ),
 			)
 		);
 	}
@@ -563,26 +546,26 @@ function scorebox_admin_enqueue( $hook_suffix ) {
 	// Post list column styles.
 	if ( 'edit.php' === $hook_suffix ) {
 		wp_enqueue_style(
-			'scorebox-admin-columns',
-			SCOREBOX_URL . 'assets/css/admin-columns.css',
+			'verdix-admin-columns',
+			VERDIX_URL . 'assets/css/admin-columns.css',
 			array(),
-			SCOREBOX_VERSION
+			VERDIX_VERSION
 		);
 	}
 }
-add_action( 'admin_enqueue_scripts', 'scorebox_admin_enqueue' );
+add_action( 'admin_enqueue_scripts', 'verdix_admin_enqueue' );
 
 // =========================================================================
 // Plugin action links
 // =========================================================================
 
-function scorebox_plugin_action_links( $links ) {
+function verdix_plugin_action_links( $links ) {
 	$settings_link = sprintf(
 		'<a href="%s">%s</a>',
-		admin_url( 'admin.php?page=scorebox-settings' ),
-		__( 'Settings', 'scorebox' )
+		admin_url( 'admin.php?page=verdix-settings' ),
+		__( 'Settings', 'verdix-reviews' )
 	);
 	array_unshift( $links, $settings_link );
 	return $links;
 }
-add_filter( 'plugin_action_links_' . SCOREBOX_BASENAME, 'scorebox_plugin_action_links' );
+add_filter( 'plugin_action_links_' . VERDIX_BASENAME, 'verdix_plugin_action_links' );

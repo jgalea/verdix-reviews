@@ -1,14 +1,14 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "scorebox/review-box",
-	"version": "1.0.0",
+	"name": "verdix/review-box",
+	"version": "2.0.0",
 	"title": "Review Box",
 	"category": "widgets",
 	"icon": "star-filled",
 	"description": "A review box with star rating, pros/cons, and structured data.",
-	"keywords": [ "review", "rating", "stars", "pros", "cons", "scorebox" ],
-	"textdomain": "scorebox",
+	"keywords": [ "review", "rating", "stars", "pros", "cons", "schema" ],
+	"textdomain": "verdix-reviews",
 	"supports": {
 		"html": false,
 		"multiple": false,

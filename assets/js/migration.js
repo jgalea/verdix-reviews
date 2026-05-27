@@ -4,13 +4,13 @@
  * Handles single-post and bulk migration AJAX requests.
  * Supports multiple migration sources (wp_review_pro, wp_product_review, legacy).
  *
- * @package ScoreBox
+ * @package Verdix Reviews
  */
 
 ( function() {
 	'use strict';
 
-	var config = window.scoreboxMigration || {};
+	var config = window.verdixMigration || {};
 	var nonce = config.nonce || '';
 	var ajaxUrl = config.ajaxUrl || '';
 	var i18n = config.i18n || {};
@@ -24,18 +24,18 @@
 	}
 
 	// Single post migration.
-	document.querySelectorAll( '.scorebox-migrate-single' ).forEach( function( btn ) {
+	document.querySelectorAll( '.verdix-migrate-single' ).forEach( function( btn ) {
 		btn.addEventListener( 'click', function() {
 			var postId = this.getAttribute( 'data-post-id' );
 			var source = this.getAttribute( 'data-source' ) || 'wp_review_pro';
-			var row = document.getElementById( 'scorebox-migrate-row-' + postId );
-			var statusCell = row.querySelector( '.scorebox-migrate-status' );
+			var row = document.getElementById( 'verdix-migrate-row-' + postId );
+			var statusCell = row.querySelector( '.verdix-migrate-status' );
 
 			this.disabled = true;
 			setStatus( statusCell, i18n.migrating || 'Migrating...', '#856404' );
 
 			var data = new FormData();
-			data.append( 'action', 'scorebox_migrate' );
+			data.append( 'action', 'verdix_migrate' );
 			data.append( 'nonce', nonce );
 			data.append( 'post_id', postId );
 			data.append( 'source', source );
@@ -61,7 +61,7 @@
 	} );
 
 	// Bulk migration — one handler for all "Migrate All" buttons.
-	document.querySelectorAll( '.scorebox-migrate-all-btn' ).forEach( function( migrateAllBtn ) {
+	document.querySelectorAll( '.verdix-migrate-all-btn' ).forEach( function( migrateAllBtn ) {
 		migrateAllBtn.addEventListener( 'click', function() {
 			if ( ! confirm( i18n.confirmAll || 'Migrate all posts? This cannot be undone.' ) ) {
 				return;
@@ -73,7 +73,7 @@
 			this.textContent = i18n.migrating || 'Migrating...';
 
 			var data = new FormData();
-			data.append( 'action', 'scorebox_migrate_all' );
+			data.append( 'action', 'verdix_migrate_all' );
 			data.append( 'nonce', nonce );
 			data.append( 'source', source );
 
@@ -84,8 +84,8 @@
 					return r.json();
 				} )
 				.then( function( resp ) {
-					var statusDiv = document.getElementById( 'scorebox-migration-status' );
-					var msgEl = document.getElementById( 'scorebox-migration-message' );
+					var statusDiv = document.getElementById( 'verdix-migration-status' );
+					var msgEl = document.getElementById( 'verdix-migration-message' );
 
 					statusDiv.style.display = 'block';
 

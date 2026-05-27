@@ -1,77 +1,77 @@
-.scorebox-box-editor {
+.verdix-box-editor {
 	--sb-star-color: #1e73be;
 	border: 1px solid #e0e0e0;
 	border-radius: 6px;
 	padding: 20px;
 	background: #f9f9f9;
 }
-.scorebox-box-editor .scorebox-box-editor__heading .components-text-control__input {
+.verdix-box-editor .verdix-box-editor__heading .components-text-control__input {
 	font-size: 18px;
 	font-weight: 600;
 	border: none;
 	background: transparent;
 	padding: 0;
 }
-.scorebox-box-editor .scorebox-box-editor__heading .components-text-control__input::placeholder {
+.verdix-box-editor .verdix-box-editor__heading .components-text-control__input::placeholder {
 	color: #999;
 	font-weight: 400;
 }
-.scorebox-box-editor .scorebox-box-editor__rating {
+.verdix-box-editor .verdix-box-editor__rating {
 	display: flex;
 	align-items: center;
 	gap: 16px;
 	margin: 12px 0;
 }
-.scorebox-box-editor .scorebox-box-editor__rating .components-range-control {
+.verdix-box-editor .verdix-box-editor__rating .components-range-control {
 	flex: 1;
 	max-width: 300px;
 	margin-bottom: 0;
 }
-.scorebox-box-editor .scorebox-box-editor__rating-display {
+.verdix-box-editor .verdix-box-editor__rating-display {
 	font-size: 16px;
 	font-weight: 600;
 	color: #333;
 	margin-left: 8px;
 }
-.scorebox-box-editor .scorebox-box-editor__summary {
+.verdix-box-editor .verdix-box-editor__summary {
 	margin: 12px 0;
 }
-.scorebox-box-editor .scorebox-box-editor__summary .components-textarea-control__input {
+.verdix-box-editor .verdix-box-editor__summary .components-textarea-control__input {
 	border: 1px dashed #ccc;
 	background: #fff;
 	border-radius: 4px;
 }
-.scorebox-box-editor .scorebox-box-editor__pros-cons {
+.verdix-box-editor .verdix-box-editor__pros-cons {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 16px;
 	margin: 16px 0;
 }
 @media (max-width: 600px) {
-	.scorebox-box-editor .scorebox-box-editor__pros-cons {
+	.verdix-box-editor .verdix-box-editor__pros-cons {
 		grid-template-columns: 1fr;
 	}
 }
-.scorebox-box-editor .scorebox-box-editor__list-heading {
+.verdix-box-editor .verdix-box-editor__list-heading {
 	font-size: 14px;
 	font-weight: 600;
 	margin: 0 0 8px;
 	padding: 4px 8px;
 	border-radius: 3px;
 }
-.scorebox-box-editor .scorebox-box-editor__list-heading--pros {
+.verdix-box-editor .verdix-box-editor__list-heading--pros {
 	color: #28a745;
 	background: rgba(40, 167, 69, 0.08);
 }
-.scorebox-box-editor .scorebox-box-editor__list-heading--cons {
+.verdix-box-editor .verdix-box-editor__list-heading--cons {
 	color: #dc3545;
 	background: rgba(220, 53, 69, 0.08);
 }
-.scorebox-box-editor .scorebox-box-editor__cta {
+.verdix-box-editor .verdix-box-editor__cta {
 	margin-top: 16px;
 	text-align: center;
 }
-.scorebox-box-editor .scorebox-box-editor__cta-button {
+.verdix-box-editor .verdix-box-editor__cta-button {
 	display: inline-block;
 	padding: 8px 24px;
 	background: var(--sb-star-color);
@@ -80,39 +80,39 @@
 	font-weight: 600;
 	font-size: 14px;
 }
-.scorebox-star-rating {
+.verdix-star-rating {
 	display: flex;
 	align-items: center;
 	gap: 2px;
 }
-.scorebox-star-rating .scorebox-star-editor:hover {
+.verdix-star-rating .verdix-star-editor:hover {
 	transform: scale(1.15);
 }
-.scorebox-star-rating .scorebox-star-editor {
+.verdix-star-rating .verdix-star-editor {
 	transition: transform 0.1s ease;
 }
-.scorebox-star-rating .scorebox-star-rating__value {
+.verdix-star-rating .verdix-star-rating__value {
 	margin-left: 8px;
 	font-size: 16px;
 	font-weight: 600;
 	color: #333;
 }
 
-.scorebox-list-editor .scorebox-list-editor__item {
+.verdix-list-editor .verdix-list-editor__item {
 	display: flex;
 	align-items: center;
 	gap: 4px;
 	margin-bottom: 4px;
 }
-.scorebox-list-editor .scorebox-list-editor__item .components-text-control__input {
+.verdix-list-editor .verdix-list-editor__item .components-text-control__input {
 	flex: 1;
 	font-size: 13px;
 }
-.scorebox-list-editor .scorebox-list-editor__item .components-base-control {
+.verdix-list-editor .verdix-list-editor__item .components-base-control {
 	flex: 1;
 	margin-bottom: 0;
 }
-.scorebox-list-editor .scorebox-list-editor__add {
+.verdix-list-editor .verdix-list-editor__add {
 	margin-top: 4px;
 	font-size: 12px;
 }

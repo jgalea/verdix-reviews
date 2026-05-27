@@ -1,19 +1,19 @@
 /**
  * Frontend review box styles.
  *
- * Base styles on .scorebox-box, then style variants via .scorebox-style-*.
+ * Base styles on .verdix-box, then style variants via .verdix-style-*.
  * Loaded on singular pages that have review data via the classic editor.
  * The block editor version uses style.scss compiled via @wordpress/scripts.
  * This file duplicates those styles for non-block-editor usage.
  *
- * @package ScoreBox
+ * @package Verdix Reviews
  */
 
 /* ==========================================================================
    BASE STYLES — shared across all templates
    ========================================================================== */
 
-.scorebox-box {
+.verdix-box {
 	--sb-accent: #1e73be;
 	--sb-accent-light: #95bae0;
 	--sb-bg: #fff;
@@ -25,25 +25,25 @@
 	box-sizing: border-box;
 }
 
-.scorebox-box *,
-.scorebox-box *::before,
-.scorebox-box *::after {
+.verdix-box *,
+.verdix-box *::before,
+.verdix-box *::after {
 	box-sizing: border-box;
 }
 
 /* Reset all theme list styles aggressively */
-.scorebox-box__pros ul,
-.scorebox-box__cons ul,
-.scorebox-box ul {
+.verdix-box__pros ul,
+.verdix-box__cons ul,
+.verdix-box ul {
 	list-style: none !important;
 	list-style-type: none !important;
 	margin: 0 !important;
 	padding: 0 !important;
 }
 
-.scorebox-box__pros li,
-.scorebox-box__cons li,
-.scorebox-box ul li {
+.verdix-box__pros li,
+.verdix-box__cons li,
+.verdix-box ul li {
 	list-style: none !important;
 	list-style-type: none !important;
 	position: relative;
@@ -55,8 +55,8 @@
 }
 
 /* Remove any theme-injected bullets */
-.scorebox-box__pros li::marker,
-.scorebox-box__cons li::marker {
+.verdix-box__pros li::marker,
+.verdix-box__cons li::marker {
 	content: none !important;
 	display: none !important;
 	font-size: 0 !important;
@@ -64,21 +64,21 @@
 
 /* --- Star overlay container (shared) --- */
 
-.scorebox-box__stars {
+.verdix-box__stars {
 	display: inline-flex;
 	align-items: center;
 	position: relative;
 	line-height: 1;
 }
 
-.scorebox-box__stars-background {
+.verdix-box__stars-background {
 	display: inline-flex;
 	align-items: center;
 	gap: 2px;
 	color: var(--sb-accent-light);
 }
 
-.scorebox-box__stars-foreground {
+.verdix-box__stars-foreground {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -90,13 +90,13 @@
 	color: var(--sb-accent);
 }
 
-.scorebox-box__stars-background svg,
-.scorebox-box__stars-foreground svg {
+.verdix-box__stars-background svg,
+.verdix-box__stars-foreground svg {
 	display: block;
 	flex-shrink: 0;
 }
 
-.scorebox-box__rating-value {
+.verdix-box__rating-value {
 	font-size: 18px;
 	font-weight: 700;
 	color: #333;
@@ -105,12 +105,12 @@
 
 /* --- CTA Button (shared) --- */
 
-.scorebox-box__cta {
+.verdix-box__cta {
 	text-align: center;
 	padding: 15px 20px;
 }
 
-.scorebox-box__cta-button {
+.verdix-box__cta-button {
 	display: inline-block;
 	padding: 10px 32px;
 	background: var(--sb-accent);
@@ -122,13 +122,13 @@
 	transition: opacity 0.15s ease;
 }
 
-.scorebox-box__cta-button:hover {
+.verdix-box__cta-button:hover {
 	opacity: 0.85;
 	color: #fff;
 	text-decoration: none;
 }
 
-.scorebox-box__cta-button:focus {
+.verdix-box__cta-button:focus {
 	outline: 2px solid var(--sb-accent);
 	outline-offset: 2px;
 }
@@ -138,7 +138,7 @@
    1. DEFAULT STYLE — WP Review Pro-like layout
    ========================================================================== */
 
-.scorebox-style-default {
+.verdix-style-default {
 	border: 1px solid var(--sb-border);
 	border-radius: 0;
 	padding: 0;
@@ -147,7 +147,7 @@
 
 /* --- Merged header (heading + product name + rating) --- */
 
-.scorebox-style-default .scorebox-box__header {
+.verdix-style-default .verdix-box__header {
 	display: flex;
 	align-items: center;
 	gap: 12px;
@@ -157,14 +157,14 @@
 	border-bottom: 1px solid var(--sb-border);
 }
 
-.scorebox-style-default .scorebox-box__header-left {
+.verdix-style-default .verdix-box__header-left {
 	display: flex;
 	flex-direction: column;
 	min-width: 0;
 	margin-right: auto;
 }
 
-.scorebox-style-default .scorebox-box__heading {
+.verdix-style-default .verdix-box__heading {
 	font-size: 11px;
 	font-weight: 600;
 	line-height: 1.2;
@@ -174,7 +174,7 @@
 	margin-bottom: 2px;
 }
 
-.scorebox-style-default .scorebox-box__product-name {
+.verdix-style-default .verdix-box__product-name {
 	font-size: 22px;
 	font-weight: 700;
 	line-height: 1.2;
@@ -185,7 +185,7 @@
 }
 
 /* Numeric score box */
-.scorebox-style-default .scorebox-box__score-box {
+.verdix-style-default .verdix-box__score-box {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -204,23 +204,23 @@
 
 /* --- Multi-criteria ratings --- */
 
-.scorebox-style-default .scorebox-box__criteria {
+.verdix-style-default .verdix-box__criteria {
 	padding: 15px 20px;
 	border-bottom: 1px solid var(--sb-border);
 }
 
-.scorebox-style-default .scorebox-box__criterion {
+.verdix-style-default .verdix-box__criterion {
 	display: flex;
 	align-items: center;
 	gap: 10px;
 	margin-bottom: 8px;
 }
 
-.scorebox-style-default .scorebox-box__criterion:last-child {
+.verdix-style-default .verdix-box__criterion:last-child {
 	margin-bottom: 0;
 }
 
-.scorebox-style-default .scorebox-box__criterion-label {
+.verdix-style-default .verdix-box__criterion-label {
 	flex: 0 0 140px;
 	font-size: 13px;
 	font-weight: 600;
@@ -228,7 +228,7 @@
 	text-align: right;
 }
 
-.scorebox-style-default .scorebox-box__criterion-bar {
+.verdix-style-default .verdix-box__criterion-bar {
 	flex: 1;
 	height: 8px;
 	background: #e0e0e0;
@@ -236,14 +236,14 @@
 	overflow: hidden;
 }
 
-.scorebox-style-default .scorebox-box__criterion-fill {
+.verdix-style-default .verdix-box__criterion-fill {
 	height: 100%;
 	background: var(--sb-accent);
 	border-radius: 4px;
 	transition: width 0.3s ease;
 }
 
-.scorebox-style-default .scorebox-box__criterion-value {
+.verdix-style-default .verdix-box__criterion-value {
 	flex: 0 0 28px;
 	font-size: 13px;
 	font-weight: 700;
@@ -252,7 +252,7 @@
 }
 
 @media (max-width: 480px) {
-	.scorebox-style-default .scorebox-box__criterion-label {
+	.verdix-style-default .verdix-box__criterion-label {
 		flex: 0 0 100px;
 		font-size: 12px;
 	}
@@ -260,7 +260,7 @@
 
 /* --- Summary --- */
 
-.scorebox-style-default .scorebox-box__summary {
+.verdix-style-default .verdix-box__summary {
 	padding: 15px 20px;
 	border-bottom: 1px solid var(--sb-border);
 	color: #444;
@@ -268,54 +268,54 @@
 	margin: 0;
 }
 
-.scorebox-style-default .scorebox-box__summary-title {
+.verdix-style-default .verdix-box__summary-title {
 	font-size: inherit;
 	font-weight: 700;
 	margin: 0 0 6px;
 	color: #333;
 }
 
-.scorebox-style-default .scorebox-box__summary p {
+.verdix-style-default .verdix-box__summary p {
 	margin: 0;
 }
 
 /* --- Pros & Cons --- */
 
-.scorebox-style-default .scorebox-box__pros-cons {
+.verdix-style-default .verdix-box__pros-cons {
 	display: flex;
 	flex-wrap: wrap;
 	margin: 0;
 	padding: 0;
 }
 
-.scorebox-style-default .scorebox-box__pros,
-.scorebox-style-default .scorebox-box__cons {
+.verdix-style-default .verdix-box__pros,
+.verdix-style-default .verdix-box__cons {
 	flex: 1 1 50%;
 	min-width: 0;
 	padding: 15px 20px;
 }
 
-.scorebox-style-default .scorebox-box__pros {
+.verdix-style-default .verdix-box__pros {
 	border-right: 1px solid var(--sb-border);
 }
 
 @media (max-width: 480px) {
-	.scorebox-style-default .scorebox-box__pros-cons {
+	.verdix-style-default .verdix-box__pros-cons {
 		flex-direction: column;
 	}
 
-	.scorebox-style-default .scorebox-box__pros,
-	.scorebox-style-default .scorebox-box__cons {
+	.verdix-style-default .verdix-box__pros,
+	.verdix-style-default .verdix-box__cons {
 		flex: 1 1 100%;
 	}
 
-	.scorebox-style-default .scorebox-box__pros {
+	.verdix-style-default .verdix-box__pros {
 		border-right: none;
 		border-bottom: 1px solid var(--sb-border);
 	}
 }
 
-.scorebox-style-default .scorebox-box__list-heading {
+.verdix-style-default .verdix-box__list-heading {
 	font-size: inherit;
 	font-weight: 700;
 	text-transform: none;
@@ -324,13 +324,13 @@
 	padding: 0 !important;
 }
 
-.scorebox-style-default .scorebox-box__pros .scorebox-box__list-heading,
-.scorebox-style-default .scorebox-box__cons .scorebox-box__list-heading {
+.verdix-style-default .verdix-box__pros .verdix-box__list-heading,
+.verdix-style-default .verdix-box__cons .verdix-box__list-heading {
 	color: #333;
 }
 
 /* Green checkmark for pros */
-.scorebox-style-default .scorebox-box__pros li::before {
+.verdix-style-default .verdix-box__pros li::before {
 	content: "\2713";
 	position: absolute;
 	left: 0;
@@ -342,7 +342,7 @@
 }
 
 /* Red X for cons */
-.scorebox-style-default .scorebox-box__cons li::before {
+.verdix-style-default .verdix-box__cons li::before {
 	content: "\2717";
 	position: absolute;
 	left: 0;
@@ -355,7 +355,7 @@
 
 /* --- CTA --- */
 
-.scorebox-style-default .scorebox-box__cta {
+.verdix-style-default .verdix-box__cta {
 	border-top: 1px solid var(--sb-border);
 }
 

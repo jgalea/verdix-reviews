@@ -1,18 +1,18 @@
 /**
- * Admin styles for ScoreBox dashboard and settings pages.
+ * Admin styles for Verdix Reviews dashboard and settings pages.
  *
- * @package ScoreBox
+ * @package Verdix Reviews
  */
 
 /* ==========================================================================
    Layout
    ========================================================================== */
 
-.scorebox-admin {
+.verdix-admin {
 	max-width: 1200px;
 }
 
-.scorebox-admin__title {
+.verdix-admin__title {
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -22,7 +22,7 @@
 	padding: 0;
 }
 
-.scorebox-admin__title .dashicons {
+.verdix-admin__title .dashicons {
 	color: #1e73be;
 	font-size: 28px;
 	width: 28px;
@@ -33,7 +33,7 @@
    Badges
    ========================================================================== */
 
-.scorebox-badge {
+.verdix-badge {
 	display: inline-block;
 	padding: 2px 10px;
 	border-radius: 3px;
@@ -44,17 +44,17 @@
 	vertical-align: middle;
 }
 
-.scorebox-badge--pro {
+.verdix-badge--pro {
 	background: #1e73be;
 	color: #fff;
 }
 
-.scorebox-badge--free {
+.verdix-badge--free {
 	background: #f0f0f0;
 	color: #666;
 }
 
-.scorebox-badge--count {
+.verdix-badge--count {
 	background: #d63638;
 	color: #fff;
 	border-radius: 10px;
@@ -67,14 +67,14 @@
    Stats cards
    ========================================================================== */
 
-.scorebox-stats {
+.verdix-stats {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 	gap: 16px;
 	margin-bottom: 24px;
 }
 
-.scorebox-stat-card {
+.verdix-stat-card {
 	display: flex;
 	align-items: center;
 	gap: 14px;
@@ -84,7 +84,7 @@
 	padding: 18px 20px;
 }
 
-.scorebox-stat-card__icon {
+.verdix-stat-card__icon {
 	font-size: 28px;
 	width: 28px;
 	height: 28px;
@@ -92,25 +92,25 @@
 	flex-shrink: 0;
 }
 
-.scorebox-stat-card__content {
+.verdix-stat-card__content {
 	display: flex;
 	flex-direction: column;
 }
 
-.scorebox-stat-card__value {
+.verdix-stat-card__value {
 	font-size: 22px;
 	font-weight: 700;
 	color: #1d2327;
 	line-height: 1.2;
 }
 
-.scorebox-stat-card__value small {
+.verdix-stat-card__value small {
 	font-size: 14px;
 	font-weight: 400;
 	color: #888;
 }
 
-.scorebox-stat-card__label {
+.verdix-stat-card__label {
 	font-size: 12px;
 	color: #888;
 	text-transform: uppercase;
@@ -122,14 +122,14 @@
    Dashboard grid
    ========================================================================== */
 
-.scorebox-dashboard__grid {
+.verdix-dashboard__grid {
 	display: grid;
 	grid-template-columns: 1fr 360px;
 	gap: 20px;
 }
 
 @media (max-width: 1024px) {
-	.scorebox-dashboard__grid {
+	.verdix-dashboard__grid {
 		grid-template-columns: 1fr;
 	}
 }
@@ -138,7 +138,7 @@
    Panels
    ========================================================================== */
 
-.scorebox-panel {
+.verdix-panel {
 	background: #fff;
 	border: 1px solid #e0e0e0;
 	border-radius: 6px;
@@ -146,7 +146,7 @@
 	margin-bottom: 20px;
 }
 
-.scorebox-panel__title {
+.verdix-panel__title {
 	font-size: 15px;
 	font-weight: 600;
 	color: #1d2327;
@@ -155,43 +155,43 @@
 	border-bottom: 1px solid #f0f0f0;
 }
 
-.scorebox-panel__subtitle {
+.verdix-panel__subtitle {
 	font-size: 13px;
 	font-weight: 600;
 	color: #50575e;
 	margin: 20px 0 10px;
 }
 
-.scorebox-panel__empty {
+.verdix-panel__empty {
 	color: #888;
 	font-style: italic;
 }
 
-.scorebox-panel__title-meta {
+.verdix-panel__title-meta {
 	font-size: 12px;
 	font-weight: 400;
 	color: #646970;
 	margin-left: 8px;
 }
 
-.scorebox-panel__footer {
+.verdix-panel__footer {
 	margin: 12px 0 0;
 	padding-top: 12px;
 	border-top: 1px solid #f0f0f0;
 	font-size: 13px;
 }
 
-.scorebox-panel__footer-sep {
+.verdix-panel__footer-sep {
 	color: #c3c4c7;
 	margin: 0 4px;
 }
 
-.scorebox-panel .form-table th {
+.verdix-panel .form-table th {
 	padding-top: 16px;
 	padding-bottom: 16px;
 }
 
-.scorebox-panel .form-table td {
+.verdix-panel .form-table td {
 	padding-top: 12px;
 	padding-bottom: 12px;
 }
@@ -200,14 +200,14 @@
    Tabs
    ========================================================================== */
 
-.scorebox-tabs {
+.verdix-tabs {
 	display: flex;
 	gap: 0;
 	margin-bottom: 24px;
 	border-bottom: 1px solid #c3c4c7;
 }
 
-.scorebox-tab {
+.verdix-tab {
 	display: flex;
 	align-items: center;
 	gap: 6px;
@@ -223,18 +223,18 @@
 	transition: color 0.15s;
 }
 
-.scorebox-tab:hover {
+.verdix-tab:hover {
 	color: #1d2327;
 }
 
-.scorebox-tab--active {
+.verdix-tab--active {
 	color: #1d2327;
 	background: #fff;
 	border-color: #c3c4c7;
 	font-weight: 600;
 }
 
-.scorebox-tab .dashicons {
+.verdix-tab .dashicons {
 	font-size: 16px;
 	width: 16px;
 	height: 16px;
@@ -244,12 +244,12 @@
    Table
    ========================================================================== */
 
-.scorebox-table {
+.verdix-table {
 	width: 100%;
 	border-collapse: collapse;
 }
 
-.scorebox-table th {
+.verdix-table th {
 	text-align: left;
 	font-size: 12px;
 	font-weight: 600;
@@ -260,23 +260,23 @@
 	border-bottom: 1px solid #f0f0f0;
 }
 
-.scorebox-table td {
+.verdix-table td {
 	padding: 10px 0;
 	border-bottom: 1px solid #f7f7f7;
 	font-size: 13px;
 	color: #333;
 }
 
-.scorebox-table tr:last-child td {
+.verdix-table tr:last-child td {
 	border-bottom: none;
 }
 
-.scorebox-table a {
+.verdix-table a {
 	text-decoration: none;
 	color: #2271b1;
 }
 
-.scorebox-table a:hover {
+.verdix-table a:hover {
 	color: #135e96;
 }
 
@@ -284,7 +284,7 @@
    Status indicators
    ========================================================================== */
 
-.scorebox-status {
+.verdix-status {
 	display: inline-block;
 	padding: 2px 8px;
 	border-radius: 3px;
@@ -292,22 +292,22 @@
 	font-weight: 600;
 }
 
-.scorebox-status--publish {
+.verdix-status--publish {
 	background: #e6f4ea;
 	color: #1e7e34;
 }
 
-.scorebox-status--draft {
+.verdix-status--draft {
 	background: #fff3cd;
 	color: #856404;
 }
 
-.scorebox-status--pending {
+.verdix-status--pending {
 	background: #fff3cd;
 	color: #856404;
 }
 
-.scorebox-status--private {
+.verdix-status--private {
 	background: #f0f0f0;
 	color: #666;
 }
@@ -316,13 +316,13 @@
    Quick links
    ========================================================================== */
 
-.scorebox-quick-links {
+.verdix-quick-links {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
 }
 
-.scorebox-quick-link {
+.verdix-quick-link {
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -334,12 +334,12 @@
 	transition: background 0.15s;
 }
 
-.scorebox-quick-link:hover {
+.verdix-quick-link:hover {
 	background: #f6f7f7;
 	color: #135e96;
 }
 
-.scorebox-quick-link .dashicons {
+.verdix-quick-link .dashicons {
 	font-size: 18px;
 	width: 18px;
 	height: 18px;
@@ -350,20 +350,20 @@
    Usage hints
    ========================================================================== */
 
-.scorebox-usage-hints {
+.verdix-usage-hints {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
 }
 
-.scorebox-hint {
+.verdix-hint {
 	padding: 10px 12px;
 	background: #f9f9f9;
 	border-radius: 4px;
 	font-size: 13px;
 }
 
-.scorebox-hint strong {
+.verdix-hint strong {
 	display: block;
 	font-size: 12px;
 	text-transform: uppercase;
@@ -372,12 +372,12 @@
 	margin-bottom: 4px;
 }
 
-.scorebox-hint p {
+.verdix-hint p {
 	margin: 0;
 	color: #333;
 }
 
-.scorebox-hint code {
+.verdix-hint code {
 	background: #e8e8e8;
 	padding: 2px 5px;
 	border-radius: 2px;
@@ -388,7 +388,7 @@
    License
    ========================================================================== */
 
-.scorebox-license-active {
+.verdix-license-active {
 	color: #1e7e34;
 	font-weight: 600;
 	display: flex;
@@ -396,13 +396,13 @@
 	gap: 4px;
 }
 
-.scorebox-license-active .dashicons {
+.verdix-license-active .dashicons {
 	font-size: 18px;
 	width: 18px;
 	height: 18px;
 }
 
-.scorebox-license-free {
+.verdix-license-free {
 	color: #666;
 }
 
@@ -410,29 +410,29 @@
    Pro features grid
    ========================================================================== */
 
-.scorebox-panel--pro-features {
+.verdix-panel--pro-features {
 	border-color: #d0d5dd;
 }
 
-.scorebox-pro-grid {
+.verdix-pro-grid {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 16px;
 }
 
 @media (max-width: 600px) {
-	.scorebox-pro-grid {
+	.verdix-pro-grid {
 		grid-template-columns: 1fr;
 	}
 }
 
-.scorebox-pro-feature {
+.verdix-pro-feature {
 	padding: 16px;
 	background: #f9f9f9;
 	border-radius: 4px;
 }
 
-.scorebox-pro-feature .dashicons {
+.verdix-pro-feature .dashicons {
 	color: #1e73be;
 	font-size: 22px;
 	width: 22px;
@@ -440,13 +440,13 @@
 	margin-bottom: 8px;
 }
 
-.scorebox-pro-feature strong {
+.verdix-pro-feature strong {
 	display: block;
 	font-size: 13px;
 	margin-bottom: 4px;
 }
 
-.scorebox-pro-feature p {
+.verdix-pro-feature p {
 	margin: 0;
 	font-size: 12px;
 	color: #666;
@@ -454,7 +454,7 @@
 }
 
 /* Migration page status badges. */
-.scorebox-migrate-badge {
+.verdix-migrate-badge {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
@@ -464,18 +464,18 @@
 	font-weight: 500;
 }
 
-.scorebox-migrate-badge .dashicons {
+.verdix-migrate-badge .dashicons {
 	font-size: 16px;
 	width: 16px;
 	height: 16px;
 }
 
-.scorebox-migrate-badge--ready {
+.verdix-migrate-badge--ready {
 	background: #e6f4ea;
 	color: #1e4d2b;
 }
 
-.scorebox-migrate-badge--none {
+.verdix-migrate-badge--none {
 	background: #f0f0f1;
 	color: #646970;
 }

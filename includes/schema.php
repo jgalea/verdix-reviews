@@ -1,45 +1,35 @@
 <?php
-/**
- * JSON-LD structured data output.
- *
- * Outputs a single <script type="application/ld+json"> tag in wp_head.
- * Supports Product, SoftwareApplication, and Thing schema types.
- * Normalizes all rating types to a 0-5 scale for schema ratingValue.
- *
- * @package ScoreBox
- */
-
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Get all supported JSON-LD schema types.
  *
  * Returns an associative array of [ value => human label ]. Types without
- * dedicated field handlers in scorebox_build_schema() fall through to a
+ * dedicated field handlers in verdix_build_schema() fall through to a
  * generic Review structure (name, review, url, image) which is still valid
  * JSON-LD for Google.
  *
  * @return array<string, string>
  */
-function scorebox_get_schema_types() {
+function verdix_get_schema_types() {
 	$types = array(
-		'Product'             => __( 'Product', 'scorebox' ),
-		'SoftwareApplication' => __( 'Software Application', 'scorebox' ),
-		'Book'                => __( 'Book', 'scorebox' ),
-		'Movie'               => __( 'Movie', 'scorebox' ),
-		'TVSeries'            => __( 'TV Series', 'scorebox' ),
-		'VideoGame'           => __( 'Video Game', 'scorebox' ),
-		'MusicAlbum'          => __( 'Music Album', 'scorebox' ),
-		'Recipe'              => __( 'Recipe', 'scorebox' ),
-		'Course'              => __( 'Course', 'scorebox' ),
-		'Event'               => __( 'Event', 'scorebox' ),
-		'LocalBusiness'       => __( 'Local Business', 'scorebox' ),
-		'Restaurant'          => __( 'Restaurant', 'scorebox' ),
-		'CreativeWork'        => __( 'Creative Work', 'scorebox' ),
-		'Thing'               => __( 'Thing (generic)', 'scorebox' ),
+		'Product'             => __( 'Product', 'verdix-reviews' ),
+		'SoftwareApplication' => __( 'Software Application', 'verdix-reviews' ),
+		'Book'                => __( 'Book', 'verdix-reviews' ),
+		'Movie'               => __( 'Movie', 'verdix-reviews' ),
+		'TVSeries'            => __( 'TV Series', 'verdix-reviews' ),
+		'VideoGame'           => __( 'Video Game', 'verdix-reviews' ),
+		'MusicAlbum'          => __( 'Music Album', 'verdix-reviews' ),
+		'Recipe'              => __( 'Recipe', 'verdix-reviews' ),
+		'Course'              => __( 'Course', 'verdix-reviews' ),
+		'Event'               => __( 'Event', 'verdix-reviews' ),
+		'LocalBusiness'       => __( 'Local Business', 'verdix-reviews' ),
+		'Restaurant'          => __( 'Restaurant', 'verdix-reviews' ),
+		'CreativeWork'        => __( 'Creative Work', 'verdix-reviews' ),
+		'Thing'               => __( 'Thing (generic)', 'verdix-reviews' ),
 	);
 
-	return apply_filters( 'scorebox_schema_types', $types );
+	return apply_filters( 'verdix_schema_types', $types );
 }
 
 /**
@@ -52,74 +42,74 @@ function scorebox_get_schema_types() {
  *
  * @return array<string, array<string, array{label: string, type: string}>>
  */
-function scorebox_get_type_fields() {
+function verdix_get_type_fields() {
 	$fields = array(
 		'Book'          => array(
-			'author' => array( 'label' => __( 'Author', 'scorebox' ),           'type' => 'text' ),
-			'isbn'   => array( 'label' => __( 'ISBN', 'scorebox' ),             'type' => 'text' ),
+			'author' => array( 'label' => __( 'Author', 'verdix-reviews' ),           'type' => 'text' ),
+			'isbn'   => array( 'label' => __( 'ISBN', 'verdix-reviews' ),             'type' => 'text' ),
 		),
 		'Movie'         => array(
-			'director' => array( 'label' => __( 'Director', 'scorebox' ),       'type' => 'text' ),
-			'duration' => array( 'label' => __( 'Duration (e.g. PT2H15M)', 'scorebox' ), 'type' => 'text' ),
+			'director' => array( 'label' => __( 'Director', 'verdix-reviews' ),       'type' => 'text' ),
+			'duration' => array( 'label' => __( 'Duration (e.g. PT2H15M)', 'verdix-reviews' ), 'type' => 'text' ),
 		),
 		'TVSeries'      => array(
-			'actor'           => array( 'label' => __( 'Lead Actor', 'scorebox' ),        'type' => 'text' ),
-			'numberOfSeasons' => array( 'label' => __( 'Number of Seasons', 'scorebox' ), 'type' => 'number' ),
+			'actor'           => array( 'label' => __( 'Lead Actor', 'verdix-reviews' ),        'type' => 'text' ),
+			'numberOfSeasons' => array( 'label' => __( 'Number of Seasons', 'verdix-reviews' ), 'type' => 'number' ),
 		),
 		'VideoGame'     => array(
-			'gamePlatform' => array( 'label' => __( 'Platform(s)', 'scorebox' ),  'type' => 'text' ),
+			'gamePlatform' => array( 'label' => __( 'Platform(s)', 'verdix-reviews' ),  'type' => 'text' ),
 		),
 		'MusicAlbum'    => array(
-			'byArtist' => array( 'label' => __( 'Artist', 'scorebox' ),          'type' => 'text' ),
+			'byArtist' => array( 'label' => __( 'Artist', 'verdix-reviews' ),          'type' => 'text' ),
 		),
 		'Recipe'        => array(
-			'recipeIngredient' => array( 'label' => __( 'Ingredients (one per line)', 'scorebox' ), 'type' => 'textarea' ),
-			'prepTime'         => array( 'label' => __( 'Prep Time (e.g. PT30M)', 'scorebox' ),    'type' => 'text' ),
-			'cookTime'         => array( 'label' => __( 'Cook Time (e.g. PT1H)', 'scorebox' ),     'type' => 'text' ),
-			'recipeYield'      => array( 'label' => __( 'Yield (e.g. 4 servings)', 'scorebox' ),   'type' => 'text' ),
+			'recipeIngredient' => array( 'label' => __( 'Ingredients (one per line)', 'verdix-reviews' ), 'type' => 'textarea' ),
+			'prepTime'         => array( 'label' => __( 'Prep Time (e.g. PT30M)', 'verdix-reviews' ),    'type' => 'text' ),
+			'cookTime'         => array( 'label' => __( 'Cook Time (e.g. PT1H)', 'verdix-reviews' ),     'type' => 'text' ),
+			'recipeYield'      => array( 'label' => __( 'Yield (e.g. 4 servings)', 'verdix-reviews' ),   'type' => 'text' ),
 		),
 		'Course'        => array(
-			'provider' => array( 'label' => __( 'Provider', 'scorebox' ),        'type' => 'text' ),
+			'provider' => array( 'label' => __( 'Provider', 'verdix-reviews' ),        'type' => 'text' ),
 		),
 		'Event'         => array(
-			'startDate' => array( 'label' => __( 'Start Date', 'scorebox' ),     'type' => 'date' ),
-			'location'  => array( 'label' => __( 'Location', 'scorebox' ),       'type' => 'text' ),
+			'startDate' => array( 'label' => __( 'Start Date', 'verdix-reviews' ),     'type' => 'date' ),
+			'location'  => array( 'label' => __( 'Location', 'verdix-reviews' ),       'type' => 'text' ),
 		),
 		'LocalBusiness' => array(
-			'address'    => array( 'label' => __( 'Address', 'scorebox' ),       'type' => 'textarea' ),
-			'telephone'  => array( 'label' => __( 'Telephone', 'scorebox' ),     'type' => 'text' ),
-			'priceRange' => array( 'label' => __( 'Price Range (e.g. $$)', 'scorebox' ), 'type' => 'text' ),
+			'address'    => array( 'label' => __( 'Address', 'verdix-reviews' ),       'type' => 'textarea' ),
+			'telephone'  => array( 'label' => __( 'Telephone', 'verdix-reviews' ),     'type' => 'text' ),
+			'priceRange' => array( 'label' => __( 'Price Range (e.g. $$)', 'verdix-reviews' ), 'type' => 'text' ),
 		),
 		'Restaurant'    => array(
-			'address'       => array( 'label' => __( 'Address', 'scorebox' ),    'type' => 'textarea' ),
-			'telephone'     => array( 'label' => __( 'Telephone', 'scorebox' ),  'type' => 'text' ),
-			'servesCuisine' => array( 'label' => __( 'Cuisine', 'scorebox' ),    'type' => 'text' ),
-			'priceRange'    => array( 'label' => __( 'Price Range (e.g. $$)', 'scorebox' ), 'type' => 'text' ),
+			'address'       => array( 'label' => __( 'Address', 'verdix-reviews' ),    'type' => 'textarea' ),
+			'telephone'     => array( 'label' => __( 'Telephone', 'verdix-reviews' ),  'type' => 'text' ),
+			'servesCuisine' => array( 'label' => __( 'Cuisine', 'verdix-reviews' ),    'type' => 'text' ),
+			'priceRange'    => array( 'label' => __( 'Price Range (e.g. $$)', 'verdix-reviews' ), 'type' => 'text' ),
 		),
 		'CreativeWork'  => array(
-			'creator' => array( 'label' => __( 'Creator', 'scorebox' ),          'type' => 'text' ),
+			'creator' => array( 'label' => __( 'Creator', 'verdix-reviews' ),          'type' => 'text' ),
 		),
 	);
 
-	return apply_filters( 'scorebox_type_fields', $fields );
+	return apply_filters( 'verdix_type_fields', $fields );
 }
 
 /**
  * Output JSON-LD schema on singular posts/pages that have review data.
  */
-function scorebox_output_schema() {
+function verdix_output_schema() {
 	if ( ! is_singular() ) {
 		return;
 	}
 
 	$post_id = get_the_ID();
-	$review  = scorebox_get_review( $post_id );
+	$review  = verdix_get_review( $post_id );
 
 	if ( ! $review || empty( $review['rating'] ) ) {
 		return;
 	}
 
-	$schema = scorebox_build_schema( $post_id, $review );
+	$schema = verdix_build_schema( $post_id, $review );
 	if ( empty( $schema ) ) {
 		return;
 	}
@@ -133,7 +123,7 @@ function scorebox_output_schema() {
 		$json // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with script-tag-safe escaping.
 	);
 }
-add_action( 'wp_head', 'scorebox_output_schema', 1 );
+add_action( 'wp_head', 'verdix_output_schema', 1 );
 
 /**
  * Build the JSON-LD schema array for a review.
@@ -142,9 +132,9 @@ add_action( 'wp_head', 'scorebox_output_schema', 1 );
  * @param array $review  Review data.
  * @return array Schema array.
  */
-function scorebox_build_schema( $post_id, $review ) {
-	$options     = get_option( 'scorebox_settings', array() );
-	$valid_types = array_keys( scorebox_get_schema_types() );
+function verdix_build_schema( $post_id, $review ) {
+	$options     = get_option( 'verdix_settings', array() );
+	$valid_types = array_keys( verdix_get_schema_types() );
 	$schema_type = ! empty( $review['schema_type'] ) && in_array( $review['schema_type'], $valid_types, true )
 		? $review['schema_type']
 		: 'Product';
@@ -166,7 +156,7 @@ function scorebox_build_schema( $post_id, $review ) {
 
 	// Normalize rating to 0-5 scale for schema output.
 	$rating_type     = ! empty( $review['rating_type'] ) ? $review['rating_type'] : 'star';
-	$schema_rating   = scorebox_normalize_to_star_scale( $review['rating'], $rating_type );
+	$schema_rating   = verdix_normalize_to_star_scale( $review['rating'], $rating_type );
 
 	$review_name = get_the_title( $post_id );
 
@@ -201,21 +191,8 @@ function scorebox_build_schema( $post_id, $review ) {
 		),
 	);
 
-	// Add review body. Append criteria breakdown if present.
-	$review_body = '';
 	if ( ! empty( $review['summary'] ) ) {
-		$review_body = $review['summary'];
-	}
-	if ( ! empty( $review['use_criteria'] ) && ! empty( $review['criteria'] ) ) {
-		$criteria_parts = array();
-		foreach ( $review['criteria'] as $criterion ) {
-			$criteria_parts[] = $criterion['label'] . ': ' . $criterion['rating'] . '/5';
-		}
-		$criteria_text = implode( ', ', $criteria_parts );
-		$review_body   = $review_body ? $review_body . ' ' . $criteria_text : $criteria_text;
-	}
-	if ( ! empty( $review_body ) ) {
-		$schema['review']['reviewBody'] = $review_body;
+		$schema['review']['reviewBody'] = $review['summary'];
 	}
 
 	// Add datePublished.
@@ -239,16 +216,16 @@ function scorebox_build_schema( $post_id, $review ) {
 	// Type-specific additions.
 	switch ( $schema_type ) {
 		case 'Product':
-			$schema = scorebox_schema_product( $schema, $review );
+			$schema = verdix_schema_product( $schema, $review );
 			break;
 
 		case 'SoftwareApplication':
-			$schema = scorebox_schema_software( $schema, $review );
+			$schema = verdix_schema_software( $schema, $review );
 			break;
 	}
 
 	// Merge user-provided per-type fields (e.g. Book author, Recipe ingredients).
-	$schema = scorebox_schema_apply_type_fields( $schema, $schema_type, $review );
+	$schema = verdix_schema_apply_type_fields( $schema, $schema_type, $review );
 
 	/**
 	 * Filter the complete JSON-LD schema array before output.
@@ -257,7 +234,7 @@ function scorebox_build_schema( $post_id, $review ) {
 	 * @param int   $post_id Post ID.
 	 * @param array $review  Review data.
 	 */
-	return apply_filters( 'scorebox_schema', $schema, $post_id, $review );
+	return apply_filters( 'verdix_schema', $schema, $post_id, $review );
 }
 
 /**
@@ -267,7 +244,7 @@ function scorebox_build_schema( $post_id, $review ) {
  * @param array $review Review data.
  * @return array Modified schema.
  */
-function scorebox_schema_product( $schema, $review ) {
+function verdix_schema_product( $schema, $review ) {
 	if ( ! empty( $review['price'] ) ) {
 		$schema['offers'] = array(
 			'@type'         => 'Offer',
@@ -300,12 +277,12 @@ function scorebox_schema_product( $schema, $review ) {
  * @param array  $review      Review data.
  * @return array Schema with type fields merged in.
  */
-function scorebox_schema_apply_type_fields( $schema, $schema_type, $review ) {
+function verdix_schema_apply_type_fields( $schema, $schema_type, $review ) {
 	if ( empty( $review['type_fields'][ $schema_type ] ) || ! is_array( $review['type_fields'][ $schema_type ] ) ) {
 		return $schema;
 	}
 
-	$registry = scorebox_get_type_fields();
+	$registry = verdix_get_type_fields();
 	if ( empty( $registry[ $schema_type ] ) ) {
 		return $schema;
 	}
@@ -347,7 +324,7 @@ function scorebox_schema_apply_type_fields( $schema, $schema_type, $review ) {
  * @param array $review Review data.
  * @return array Modified schema.
  */
-function scorebox_schema_software( $schema, $review ) {
+function verdix_schema_software( $schema, $review ) {
 	$schema['applicationCategory'] = 'WebApplication';
 
 	if ( ! empty( $review['price'] ) ) {

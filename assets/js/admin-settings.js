@@ -1,7 +1,7 @@
 /**
  * Admin settings page JS — color picker + live preview refresh.
  *
- * @package ScoreBox
+ * @package Verdix Reviews
  */
 
 ( function( $ ) {
@@ -15,20 +15,20 @@
 	}
 
 	function refreshPreview() {
-		var $container = $( '#scorebox-settings-preview' );
-		if ( ! $container.length || typeof scoreboxPreview === 'undefined' ) {
+		var $container = $( '#verdix-settings-preview' );
+		if ( ! $container.length || typeof verdixPreview === 'undefined' ) {
 			return;
 		}
 
 		$container.css( 'opacity', 0.6 );
 
-		$.post( scoreboxPreview.ajaxUrl, {
-			action:       'scorebox_render_preview',
-			nonce:        scoreboxPreview.nonce,
-			style:        $( '#scorebox_default_style' ).val() || 'default',
-			accent_color: $( '#scorebox_accent_color' ).val(),
-			bg_color:     $( '#scorebox_bg_color' ).val(),
-			border_color: $( '#scorebox_border_color' ).val()
+		$.post( verdixPreview.ajaxUrl, {
+			action:       'verdix_render_preview',
+			nonce:        verdixPreview.nonce,
+			style:        $( '#verdix_default_style' ).val() || 'default',
+			accent_color: $( '#verdix_accent_color' ).val(),
+			bg_color:     $( '#verdix_bg_color' ).val(),
+			border_color: $( '#verdix_border_color' ).val()
 		} ).done( function( resp ) {
 			if ( resp && resp.success && resp.data && resp.data.html ) {
 				$container.html( resp.data.html );
@@ -39,11 +39,11 @@
 	}
 
 	$( function() {
-		$( '.scorebox-color-picker' ).wpColorPicker( {
+		$( '.verdix-color-picker' ).wpColorPicker( {
 			change: scheduleRefresh,
 			clear:  scheduleRefresh
 		} );
 
-		$( '#scorebox_default_style' ).on( 'change', refreshPreview );
+		$( '#verdix_default_style' ).on( 'change', refreshPreview );
 	} );
 } )( jQuery );

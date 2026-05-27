@@ -1,13 +1,4 @@
 <?php
-/**
- * Extension point registry for ScoreBox.
- *
- * Provides filterable registries for rating types, styles, migration sources,
- * and editor configuration. Pro add-ons extend these via WordPress filters.
- *
- * @package ScoreBox
- */
-
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -22,36 +13,33 @@ defined( 'ABSPATH' ) || exit;
  *
  * @return array<string, array>
  */
-function scorebox_get_rating_types() {
+function verdix_get_rating_types() {
 	$types = array(
 		'star' => array(
-			'label'  => __( 'Star (0-5)', 'scorebox' ),
+			'label'  => __( 'Star (0-5)', 'verdix-reviews' ),
 			'max'    => 5,
 			'step'   => 0.5,
-			'render' => 'scorebox_render_stars_display',
+			'render' => 'verdix_render_stars_display',
 			'format' => '%s/5',
 		),
 	);
 
-	return apply_filters( 'scorebox_rating_types', $types );
+	return apply_filters( 'verdix_rating_types', $types );
 }
 
 /**
  * Get all registered box styles.
  *
- * Returns an associative array keyed by style slug. Each entry contains:
- *   label (string) Human-readable label.
- *
  * @return array<string, array>
  */
-function scorebox_get_styles() {
+function verdix_get_styles() {
 	$styles = array(
 		'default' => array(
-			'label' => __( 'Default (Classic)', 'scorebox' ),
+			'label' => __( 'Default', 'verdix-reviews' ),
 		),
 	);
 
-	return apply_filters( 'scorebox_styles', $styles );
+	return apply_filters( 'verdix_styles', $styles );
 }
 
 /**
@@ -59,21 +47,35 @@ function scorebox_get_styles() {
  *
  * Returns an associative array keyed by source slug. Each entry contains:
  *   label    (string)   Human-readable label.
- *   detect   (callable) Function name that returns an array of WP_Post objects to migrate.
- *   migrate  (callable) Function name that migrates a single post by ID.
- *   columns  (array)    Column definitions for the migration table (label => heading).
- *   row_data (callable) Function name that returns per-row display data for a given post ID.
+ *   detect   (callable) Returns an array of WP_Post objects to migrate.
+ *   migrate  (callable) Migrates a single post by ID.
+ *   columns  (array)    Column definitions for the migration table.
+ *   row_data (callable) Returns per-row display data for a given post.
  *
  * @return array<string, array>
  */
+function verdix_get_migration_sources() {
+	$sources = array(
+		'wp_review_pro' => array(
+			'label'    => __( 'WP Review Pro', 'verdix-reviews' ),
+			'detect'   => 'verdix_get_migratable_posts',
+			'migrate'  => 'verdix_migrate_post_wp_review_pro',
+			'columns'  => array( 'type', 'rating', 'schema', 'pros', 'cons' ),
+			'row_data' => 'verdix_migration_row_wp_review_pro',
+		),
+	);
+
+	return apply_filters( 'verdix_migration_sources', $sources );
+}
+
 /**
  * Count posts migratable across every registered source.
  *
  * @return int
  */
-function scorebox_count_all_migratable() {
+function verdix_count_all_migratable() {
 	$total = 0;
-	foreach ( scorebox_get_migration_sources() as $source ) {
+	foreach ( verdix_get_migration_sources() as $source ) {
 		if ( isset( $source['detect'] ) && is_callable( $source['detect'] ) ) {
 			$posts  = call_user_func( $source['detect'] );
 			$total += is_array( $posts ) ? count( $posts ) : 0;
@@ -82,38 +84,14 @@ function scorebox_count_all_migratable() {
 	return $total;
 }
 
-function scorebox_get_migration_sources() {
-	$sources = array(
-		'wp_review_pro' => array(
-			'label'    => __( 'WP Review Pro', 'scorebox' ),
-			'detect'   => 'scorebox_get_migratable_posts',
-			'migrate'  => 'scorebox_migrate_post_wp_review_pro',
-			'columns'  => array( 'type', 'rating', 'schema', 'pros', 'cons' ),
-			'row_data' => 'scorebox_migration_row_wp_review_pro',
-		),
-	);
-
-	return apply_filters( 'scorebox_migration_sources', $sources );
-}
-
 /**
  * Build the editor configuration array for the block editor JS.
  *
- * Transforms the registered rating types and styles into the shape expected
- * by the block editor script (window.scoreboxConfig).
- *
- * @return array {
- *   @type array $ratingTypes  Flat array of { value, label, max, step, format }.
- *   @type array $styles       Flat array of { value, label }.
- *   @type array $features     Feature flags: criteria (bool).
- * }
+ * @return array
  */
-function scorebox_get_editor_config() {
-	$types = scorebox_get_rating_types();
-	$styles = scorebox_get_styles();
-
+function verdix_get_editor_config() {
 	$rating_types_config = array();
-	foreach ( $types as $slug => $type ) {
+	foreach ( verdix_get_rating_types() as $slug => $type ) {
 		$rating_types_config[] = array(
 			'value'  => $slug,
 			'label'  => $type['label'],
@@ -124,7 +102,7 @@ function scorebox_get_editor_config() {
 	}
 
 	$styles_config = array();
-	foreach ( $styles as $slug => $style ) {
+	foreach ( verdix_get_styles() as $slug => $style ) {
 		$styles_config[] = array(
 			'value' => $slug,
 			'label' => $style['label'],
@@ -132,7 +110,7 @@ function scorebox_get_editor_config() {
 	}
 
 	$schema_types_config = array();
-	foreach ( scorebox_get_schema_types() as $slug => $label ) {
+	foreach ( verdix_get_schema_types() as $slug => $label ) {
 		$schema_types_config[] = array(
 			'value' => $slug,
 			'label' => $label,
@@ -140,7 +118,7 @@ function scorebox_get_editor_config() {
 	}
 
 	$type_fields_config = array();
-	foreach ( scorebox_get_type_fields() as $type_key => $fields ) {
+	foreach ( verdix_get_type_fields() as $type_key => $fields ) {
 		$list = array();
 		foreach ( $fields as $field_key => $def ) {
 			$list[] = array(
@@ -157,10 +135,7 @@ function scorebox_get_editor_config() {
 		'styles'      => $styles_config,
 		'schemaTypes' => $schema_types_config,
 		'typeFields'  => $type_fields_config,
-		'features'    => array(
-			'criteria' => false,
-		),
 	);
 
-	return apply_filters( 'scorebox_editor_config', $config );
+	return apply_filters( 'verdix_editor_config', $config );
 }

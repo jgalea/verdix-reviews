@@ -1,23 +1,17 @@
 <?php
-/**
- * Dashboard page template.
- *
- * @package ScoreBox
- */
-
 defined( 'ABSPATH' ) || exit;
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- File is included inside a class method; variables are function-scoped, not global.
 
-$options    = get_option( 'scorebox_settings', array() );
-$post_types = apply_filters( 'scorebox_post_types', isset( $options['post_types'] ) ? $options['post_types'] : array( 'post', 'page' ) );
+$options    = get_option( 'verdix_settings', array() );
+$post_types = apply_filters( 'verdix_post_types', isset( $options['post_types'] ) ? $options['post_types'] : array( 'post', 'page' ) );
 // Count reviewed posts.
 global $wpdb;
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 $total_reviews = (int) $wpdb->get_var(
 	$wpdb->prepare(
 		"SELECT COUNT(DISTINCT post_id) FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value != %s",
-		'_scorebox_review',
+		'_verdix_review',
 		''
 	)
 );
@@ -34,7 +28,7 @@ $recent_ids = $wpdb->get_col(
 		AND p.post_status IN (%s, %s, %s, %s)
 		ORDER BY p.post_modified DESC
 		LIMIT %d",
-		'_scorebox_review',
+		'_verdix_review',
 		'',
 		'publish',
 		'draft',
@@ -52,7 +46,7 @@ if ( $total_reviews > 0 ) {
 	$all_meta = $wpdb->get_col(
 		$wpdb->prepare(
 			"SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value != %s",
-			'_scorebox_review',
+			'_verdix_review',
 			''
 		)
 	);
@@ -61,7 +55,7 @@ if ( $total_reviews > 0 ) {
 		$data = json_decode( $raw, true );
 		if ( is_array( $data ) && ! empty( $data['rating'] ) ) {
 			$type = ! empty( $data['rating_type'] ) ? $data['rating_type'] : 'star';
-			$sum += scorebox_normalize_to_star_scale( $data['rating'], $type );
+			$sum += verdix_normalize_to_star_scale( $data['rating'], $type );
 			$rating_count++;
 		}
 	}
@@ -71,7 +65,7 @@ if ( $total_reviews > 0 ) {
 }
 
 // Count migratable posts across all registered migration sources (WP Review Pro + Pro sources).
-$wp_review_count = scorebox_count_all_migratable();
+$wp_review_count = verdix_count_all_migratable();
 
 // Latest review — use the most recently modified reviewed post.
 $latest_review_label = '—';
@@ -82,111 +76,103 @@ if ( ! empty( $recent_ids ) ) {
 		$latest_gmt = strtotime( $latest_post->post_modified_gmt );
 		if ( $latest_gmt ) {
 			/* translators: %s: human-readable time difference, e.g. "2 days". */
-			$latest_review_label = sprintf( __( '%s ago', 'scorebox' ), human_time_diff( $latest_gmt ) );
+			$latest_review_label = sprintf( __( '%s ago', 'verdix-reviews' ), human_time_diff( $latest_gmt ) );
 			$latest_review_title = $latest_post->post_title;
 		}
 	}
 }
 ?>
-<div class="wrap scorebox-admin">
-	<h1 class="scorebox-admin__title">
+<div class="wrap verdix-admin">
+	<h1 class="verdix-admin__title">
 		<span class="dashicons dashicons-star-filled"></span>
-		<?php esc_html_e( 'ScoreBox', 'scorebox' ); ?>
-		<?php do_action( 'scorebox_admin_dashboard_title_badge' ); ?>
+		<?php esc_html_e( 'Verdix Reviews', 'verdix-reviews' ); ?>
+		<?php do_action( 'verdix_admin_dashboard_title_badge' ); ?>
 	</h1>
 
-	<div class="scorebox-dashboard">
+	<div class="verdix-dashboard">
 		<!-- Stats cards -->
-		<div class="scorebox-stats">
-			<div class="scorebox-stat-card">
-				<div class="scorebox-stat-card__icon dashicons dashicons-edit"></div>
-				<div class="scorebox-stat-card__content">
-					<span class="scorebox-stat-card__value"><?php echo esc_html( $total_reviews ); ?></span>
-					<span class="scorebox-stat-card__label"><?php esc_html_e( 'Total Reviews', 'scorebox' ); ?></span>
+		<div class="verdix-stats">
+			<div class="verdix-stat-card">
+				<div class="verdix-stat-card__icon dashicons dashicons-edit"></div>
+				<div class="verdix-stat-card__content">
+					<span class="verdix-stat-card__value"><?php echo esc_html( $total_reviews ); ?></span>
+					<span class="verdix-stat-card__label"><?php esc_html_e( 'Total Reviews', 'verdix-reviews' ); ?></span>
 				</div>
 			</div>
 
-			<div class="scorebox-stat-card">
-				<div class="scorebox-stat-card__icon dashicons dashicons-star-filled"></div>
-				<div class="scorebox-stat-card__content">
-					<span class="scorebox-stat-card__value"><?php echo esc_html( $avg_rating ); ?><small>/5</small></span>
-					<span class="scorebox-stat-card__label"><?php esc_html_e( 'Average Rating', 'scorebox' ); ?></span>
+			<div class="verdix-stat-card">
+				<div class="verdix-stat-card__icon dashicons dashicons-star-filled"></div>
+				<div class="verdix-stat-card__content">
+					<span class="verdix-stat-card__value"><?php echo esc_html( $avg_rating ); ?><small>/5</small></span>
+					<span class="verdix-stat-card__label"><?php esc_html_e( 'Average Rating', 'verdix-reviews' ); ?></span>
 				</div>
 			</div>
 
-			<div class="scorebox-stat-card">
-				<div class="scorebox-stat-card__icon dashicons dashicons-migrate"></div>
-				<div class="scorebox-stat-card__content">
-					<span class="scorebox-stat-card__value"><?php echo esc_html( $wp_review_count ); ?></span>
-					<span class="scorebox-stat-card__label">
+			<div class="verdix-stat-card">
+				<div class="verdix-stat-card__icon dashicons dashicons-migrate"></div>
+				<div class="verdix-stat-card__content">
+					<span class="verdix-stat-card__value"><?php echo esc_html( $wp_review_count ); ?></span>
+					<span class="verdix-stat-card__label">
 						<?php if ( $wp_review_count > 0 ) : ?>
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=scorebox-migration' ) ); ?>">
-								<?php esc_html_e( 'Ready to Migrate', 'scorebox' ); ?>
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=verdix-migration' ) ); ?>">
+								<?php esc_html_e( 'Ready to Migrate', 'verdix-reviews' ); ?>
 							</a>
 						<?php else : ?>
-							<?php esc_html_e( 'Ready to Migrate', 'scorebox' ); ?>
+							<?php esc_html_e( 'Ready to Migrate', 'verdix-reviews' ); ?>
 						<?php endif; ?>
 					</span>
 				</div>
 			</div>
 
-			<div class="scorebox-stat-card"<?php echo $latest_review_title ? ' title="' . esc_attr( $latest_review_title ) . '"' : ''; ?>>
-				<div class="scorebox-stat-card__icon dashicons dashicons-clock"></div>
-				<div class="scorebox-stat-card__content">
-					<span class="scorebox-stat-card__value"><?php echo esc_html( $latest_review_label ); ?></span>
-					<span class="scorebox-stat-card__label"><?php esc_html_e( 'Latest Review', 'scorebox' ); ?></span>
+			<div class="verdix-stat-card"<?php echo $latest_review_title ? ' title="' . esc_attr( $latest_review_title ) . '"' : ''; ?>>
+				<div class="verdix-stat-card__icon dashicons dashicons-clock"></div>
+				<div class="verdix-stat-card__content">
+					<span class="verdix-stat-card__value"><?php echo esc_html( $latest_review_label ); ?></span>
+					<span class="verdix-stat-card__label"><?php esc_html_e( 'Latest Review', 'verdix-reviews' ); ?></span>
 				</div>
 			</div>
 		</div>
-		<?php do_action( 'scorebox_admin_dashboard_after_stats' ); ?>
+		<?php do_action( 'verdix_admin_dashboard_after_stats' ); ?>
 
-		<div class="scorebox-dashboard__grid">
+		<div class="verdix-dashboard__grid">
 			<!-- Recent reviews -->
-			<div class="scorebox-panel">
-				<h2 class="scorebox-panel__title">
-					<?php esc_html_e( 'Recent Reviews', 'scorebox' ); ?>
+			<div class="verdix-panel">
+				<h2 class="verdix-panel__title">
+					<?php esc_html_e( 'Recent Reviews', 'verdix-reviews' ); ?>
 					<?php if ( $total_reviews > 10 ) : ?>
-						<span class="scorebox-panel__title-meta">
+						<span class="verdix-panel__title-meta">
 							<?php
 							/* translators: %d: total number of reviews */
-							echo esc_html( sprintf( __( 'showing 10 of %d', 'scorebox' ), $total_reviews ) );
+							echo esc_html( sprintf( __( 'showing 10 of %d', 'verdix-reviews' ), $total_reviews ) );
 							?>
 						</span>
 					<?php endif; ?>
 				</h2>
 				<?php if ( empty( $recent_ids ) ) : ?>
-					<p class="scorebox-panel__empty"><?php esc_html_e( 'No reviews yet. Add a Review Box block to any post to get started.', 'scorebox' ); ?></p>
+					<p class="verdix-panel__empty"><?php esc_html_e( 'No reviews yet. Add a Review Box block to any post to get started.', 'verdix-reviews' ); ?></p>
 				<?php else : ?>
-					<table class="scorebox-table">
+					<table class="verdix-table">
 						<thead>
 							<tr>
-								<th><?php esc_html_e( 'Post', 'scorebox' ); ?></th>
-								<th><?php esc_html_e( 'Rating', 'scorebox' ); ?></th>
-								<th><?php esc_html_e( 'Type', 'scorebox' ); ?></th>
-								<th><?php esc_html_e( 'Status', 'scorebox' ); ?></th>
+								<th><?php esc_html_e( 'Post', 'verdix-reviews' ); ?></th>
+								<th><?php esc_html_e( 'Rating', 'verdix-reviews' ); ?></th>
+								<th><?php esc_html_e( 'Type', 'verdix-reviews' ); ?></th>
+								<th><?php esc_html_e( 'Status', 'verdix-reviews' ); ?></th>
 							</tr>
 						</thead>
 						<tbody>
 							<?php foreach ( $recent_ids as $pid ) : ?>
 								<?php
 								$post   = get_post( $pid );
-								$review = scorebox_get_review( $pid );
+								$review = verdix_get_review( $pid );
 								if ( ! $post || ! $review ) {
 									continue;
 								}
 								$r_type  = ! empty( $review['rating_type'] ) ? $review['rating_type'] : 'star';
-								$display = $review['rating'];
-								switch ( $r_type ) {
-									case 'percentage':
-										$display = round( $review['rating'] ) . '%';
-										break;
-									case 'point':
-										$display = $review['rating'] . '/10';
-										break;
-									default:
-										$display = $review['rating'] . '/5';
-										break;
-								}
+								$rt_reg  = verdix_get_rating_types();
+								$rt_def  = isset( $rt_reg[ $r_type ] ) ? $rt_reg[ $r_type ] : $rt_reg['star'];
+								$rt_fmt  = isset( $rt_def['format'] ) ? $rt_def['format'] : '%s/5';
+								$display = sprintf( $rt_fmt, $review['rating'] );
 								?>
 								<tr>
 									<td>
@@ -197,7 +183,7 @@ if ( ! empty( $recent_ids ) ) {
 									<td><strong><?php echo esc_html( $display ); ?></strong></td>
 									<td><?php echo esc_html( ucfirst( $r_type ) ); ?></td>
 									<td>
-										<span class="scorebox-status scorebox-status--<?php echo esc_attr( $post->post_status ); ?>">
+										<span class="verdix-status verdix-status--<?php echo esc_attr( $post->post_status ); ?>">
 											<?php echo esc_html( get_post_status_object( $post->post_status )->label ); ?>
 										</span>
 									</td>
@@ -205,48 +191,48 @@ if ( ! empty( $recent_ids ) ) {
 							<?php endforeach; ?>
 						</tbody>
 					</table>
-					<p class="scorebox-panel__footer">
-						<a href="<?php echo esc_url( admin_url( 'edit.php?orderby=scorebox_rating&order=DESC' ) ); ?>">
-							<?php esc_html_e( 'View all reviewed posts', 'scorebox' ); ?> &rarr;
+					<p class="verdix-panel__footer">
+						<a href="<?php echo esc_url( admin_url( 'edit.php?orderby=verdix_rating&order=DESC' ) ); ?>">
+							<?php esc_html_e( 'View all reviewed posts', 'verdix-reviews' ); ?> &rarr;
 						</a>
 					</p>
 				<?php endif; ?>
 			</div>
 
 			<!-- Quick links panel -->
-			<div class="scorebox-panel">
-				<h2 class="scorebox-panel__title"><?php esc_html_e( 'Quick Links', 'scorebox' ); ?></h2>
-				<div class="scorebox-quick-links">
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=scorebox-settings' ) ); ?>" class="scorebox-quick-link">
+			<div class="verdix-panel">
+				<h2 class="verdix-panel__title"><?php esc_html_e( 'Quick Links', 'verdix-reviews' ); ?></h2>
+				<div class="verdix-quick-links">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=verdix-settings' ) ); ?>" class="verdix-quick-link">
 						<span class="dashicons dashicons-admin-generic"></span>
-						<?php esc_html_e( 'Settings', 'scorebox' ); ?>
+						<?php esc_html_e( 'Settings', 'verdix-reviews' ); ?>
 					</a>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=scorebox-migration' ) ); ?>" class="scorebox-quick-link">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=verdix-migration' ) ); ?>" class="verdix-quick-link">
 						<span class="dashicons dashicons-migrate"></span>
-						<?php esc_html_e( 'Migration Tools', 'scorebox' ); ?>
+						<?php esc_html_e( 'Migration Tools', 'verdix-reviews' ); ?>
 						<?php if ( $wp_review_count > 0 ) : ?>
-							<span class="scorebox-badge scorebox-badge--count"><?php echo esc_html( $wp_review_count ); ?></span>
+							<span class="verdix-badge verdix-badge--count"><?php echo esc_html( $wp_review_count ); ?></span>
 						<?php endif; ?>
 					</a>
-					<a href="<?php echo esc_url( admin_url( 'post-new.php' ) ); ?>" class="scorebox-quick-link">
+					<a href="<?php echo esc_url( admin_url( 'post-new.php' ) ); ?>" class="verdix-quick-link">
 						<span class="dashicons dashicons-plus-alt2"></span>
-						<?php esc_html_e( 'New Review Post', 'scorebox' ); ?>
+						<?php esc_html_e( 'New Review Post', 'verdix-reviews' ); ?>
 					</a>
 				</div>
 
-				<h3 class="scorebox-panel__subtitle"><?php esc_html_e( 'Usage', 'scorebox' ); ?></h3>
-				<div class="scorebox-usage-hints">
-					<div class="scorebox-hint">
-						<strong><?php esc_html_e( 'Block Editor', 'scorebox' ); ?></strong>
-						<p><?php esc_html_e( 'Add the "Review Box" block to any post or page.', 'scorebox' ); ?></p>
+				<h3 class="verdix-panel__subtitle"><?php esc_html_e( 'Usage', 'verdix-reviews' ); ?></h3>
+				<div class="verdix-usage-hints">
+					<div class="verdix-hint">
+						<strong><?php esc_html_e( 'Block Editor', 'verdix-reviews' ); ?></strong>
+						<p><?php esc_html_e( 'Add the "Review Box" block to any post or page.', 'verdix-reviews' ); ?></p>
 					</div>
-					<div class="scorebox-hint">
-						<strong><?php esc_html_e( 'Shortcode', 'scorebox' ); ?></strong>
-						<p><code>[scorebox]</code> <?php esc_html_e( 'or', 'scorebox' ); ?> <code>[scorebox id="123"]</code></p>
+					<div class="verdix-hint">
+						<strong><?php esc_html_e( 'Shortcode', 'verdix-reviews' ); ?></strong>
+						<p><code>[verdix]</code> <?php esc_html_e( 'or', 'verdix-reviews' ); ?> <code>[verdix id="123"]</code></p>
 					</div>
-					<div class="scorebox-hint">
-						<strong><?php esc_html_e( 'REST API', 'scorebox' ); ?></strong>
-						<p><code>/wp-json/scorebox/v1/review/{id}</code></p>
+					<div class="verdix-hint">
+						<strong><?php esc_html_e( 'REST API', 'verdix-reviews' ); ?></strong>
+						<p><code>/wp-json/verdix/v1/review/{id}</code></p>
 					</div>
 				</div>
 			</div>

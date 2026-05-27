@@ -1,55 +1,55 @@
 /**
  * Post list table column styles.
  *
- * @package ScoreBox
+ * @package Verdix Reviews
  */
 
-.column-scorebox_rating {
+.column-verdix_rating {
 	width: 120px;
 }
 
-.scorebox-col-rating {
+.verdix-col-rating {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
 	white-space: nowrap;
 }
 
-.scorebox-col-rating strong {
+.verdix-col-rating strong {
 	font-size: 13px;
 	color: #1d2327;
 }
 
-.scorebox-col-empty {
+.verdix-col-empty {
 	color: #ccc;
 }
 
-.scorebox-col-star {
+.verdix-col-star {
 	display: inline-block;
 	width: 14px;
 	height: 14px;
 	position: relative;
 }
 
-.scorebox-col-star::before {
+.verdix-col-star::before {
 	content: "\2605";
 	font-size: 14px;
 	line-height: 1;
 }
 
-.scorebox-col-star--full::before {
+.verdix-col-star--full::before {
 	color: #f0b849;
 }
 
-.scorebox-col-star--half {
+.verdix-col-star--half {
 	overflow: hidden;
 }
 
-.scorebox-col-star--half::before {
+.verdix-col-star--half::before {
 	color: #f0b849;
 }
 
-.scorebox-col-star--half::after {
+.verdix-col-star--half::after {
 	content: "\2605";
 	position: absolute;
 	left: 50%;
@@ -60,6 +60,6 @@
 	clip-path: inset(0 0 0 0);
 }
 
-.scorebox-col-star--empty::before {
+.verdix-col-star--empty::before {
 	color: #ddd;
 }

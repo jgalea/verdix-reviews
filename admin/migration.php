@@ -1,12 +1,4 @@
 <?php
-/**
- * Migration tools for ScoreBox.
- *
- * Supports migration from WP Review Pro (free + pro).
- *
- * @package ScoreBox
- */
-
 defined( 'ABSPATH' ) || exit;
 
 // Menu registration is handled by admin/settings.php.
@@ -18,21 +10,21 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Handle single post migration AJAX request.
  */
-function scorebox_ajax_migrate() {
-	check_ajax_referer( 'scorebox_migrate', 'nonce' );
+function verdix_ajax_migrate() {
+	check_ajax_referer( 'verdix_migrate', 'nonce' );
 
 	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_send_json_error( array( 'message' => __( 'Permission denied.', 'scorebox' ) ) );
+		wp_send_json_error( array( 'message' => __( 'Permission denied.', 'verdix-reviews' ) ) );
 	}
 
 	$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 	$source  = isset( $_POST['source'] ) ? sanitize_text_field( wp_unslash( $_POST['source'] ) ) : 'wp_review_pro';
 
 	if ( ! $post_id ) {
-		wp_send_json_error( array( 'message' => __( 'Invalid post ID.', 'scorebox' ) ) );
+		wp_send_json_error( array( 'message' => __( 'Invalid post ID.', 'verdix-reviews' ) ) );
 	}
 
-	$result = scorebox_migrate_post( $post_id, $source );
+	$result = verdix_migrate_post( $post_id, $source );
 
 	if ( is_wp_error( $result ) ) {
 		wp_send_json_error( array( 'message' => $result->get_error_message() ) );
@@ -42,30 +34,30 @@ function scorebox_ajax_migrate() {
 		array(
 			'message' => sprintf(
 				/* translators: %s: post title */
-				__( 'Migrated: %s', 'scorebox' ),
+				__( 'Migrated: %s', 'verdix-reviews' ),
 				get_the_title( $post_id )
 			),
 			'post_id' => $post_id,
 		)
 	);
 }
-add_action( 'wp_ajax_scorebox_migrate', 'scorebox_ajax_migrate' );
+add_action( 'wp_ajax_verdix_migrate', 'verdix_ajax_migrate' );
 
 /**
  * Handle bulk migration AJAX request.
  */
-function scorebox_ajax_migrate_all() {
-	check_ajax_referer( 'scorebox_migrate', 'nonce' );
+function verdix_ajax_migrate_all() {
+	check_ajax_referer( 'verdix_migrate', 'nonce' );
 
 	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_send_json_error( array( 'message' => __( 'Permission denied.', 'scorebox' ) ) );
+		wp_send_json_error( array( 'message' => __( 'Permission denied.', 'verdix-reviews' ) ) );
 	}
 
 	$source = isset( $_POST['source'] ) ? sanitize_text_field( wp_unslash( $_POST['source'] ) ) : 'wp_review_pro';
 
-	$sources = scorebox_get_migration_sources();
+	$sources = verdix_get_migration_sources();
 	if ( ! isset( $sources[ $source ] ) ) {
-		wp_send_json_error( array( 'message' => __( 'Unknown source.', 'scorebox' ) ) );
+		wp_send_json_error( array( 'message' => __( 'Unknown source.', 'verdix-reviews' ) ) );
 	}
 	$posts = call_user_func( $sources[ $source ]['detect'] );
 
@@ -73,7 +65,7 @@ function scorebox_ajax_migrate_all() {
 	$errors   = array();
 
 	foreach ( $posts as $post ) {
-		$result = scorebox_migrate_post( $post->ID, $source );
+		$result = verdix_migrate_post( $post->ID, $source );
 		if ( is_wp_error( $result ) ) {
 			$errors[] = sprintf( '%s: %s', get_the_title( $post->ID ), $result->get_error_message() );
 		} else {
@@ -87,13 +79,13 @@ function scorebox_ajax_migrate_all() {
 			'errors'   => $errors,
 			'message'  => sprintf(
 				/* translators: %d: number of posts migrated */
-				__( 'Migration complete. %d posts migrated.', 'scorebox' ),
+				__( 'Migration complete. %d posts migrated.', 'verdix-reviews' ),
 				$migrated
 			),
 		)
 	);
 }
-add_action( 'wp_ajax_scorebox_migrate_all', 'scorebox_ajax_migrate_all' );
+add_action( 'wp_ajax_verdix_migrate_all', 'verdix_ajax_migrate_all' );
 
 // =========================================================================
 // Migration: WP Review Pro
@@ -106,10 +98,10 @@ add_action( 'wp_ajax_scorebox_migrate_all', 'scorebox_ajax_migrate_all' );
  * @param string $source  Migration source key.
  * @return true|WP_Error True on success, WP_Error on failure.
  */
-function scorebox_migrate_post( $post_id, $source = 'wp_review_pro' ) {
-	$sources = scorebox_get_migration_sources();
+function verdix_migrate_post( $post_id, $source = 'wp_review_pro' ) {
+	$sources = verdix_get_migration_sources();
 	if ( ! isset( $sources[ $source ] ) || ! is_callable( $sources[ $source ]['migrate'] ) ) {
-		return new WP_Error( 'invalid_source', __( 'Unknown migration source.', 'scorebox' ) );
+		return new WP_Error( 'invalid_source', __( 'Unknown migration source.', 'verdix-reviews' ) );
 	}
 	return call_user_func( $sources[ $source ]['migrate'], $post_id );
 }
@@ -120,19 +112,19 @@ function scorebox_migrate_post( $post_id, $source = 'wp_review_pro' ) {
  * @param int $post_id Post ID.
  * @return true|WP_Error
  */
-function scorebox_migrate_post_wp_review_pro( $post_id ) {
+function verdix_migrate_post_wp_review_pro( $post_id ) {
 	$wp_review_type = get_post_meta( $post_id, 'wp_review_type', true );
 
 	if ( empty( $wp_review_type ) || 'none' === $wp_review_type ) {
-		return new WP_Error( 'no_review', __( 'No WP Review Pro data found.', 'scorebox' ) );
+		return new WP_Error( 'no_review', __( 'No WP Review Pro data found.', 'verdix-reviews' ) );
 	}
 
 	// Already migrated?
-	$existing = get_post_meta( $post_id, '_scorebox_review', true );
+	$existing = get_post_meta( $post_id, '_verdix_review', true );
 	if ( ! empty( $existing ) ) {
 		$existing_data = json_decode( $existing, true );
 		if ( is_array( $existing_data ) && ! empty( $existing_data['rating'] ) ) {
-			return new WP_Error( 'already_migrated', __( 'Already has ScoreBox data.', 'scorebox' ) );
+			return new WP_Error( 'already_migrated', __( 'Already has Verdix Reviews data.', 'verdix-reviews' ) );
 		}
 	}
 
@@ -151,50 +143,18 @@ function scorebox_migrate_post_wp_review_pro( $post_id ) {
 	$author_name = get_post_meta( $post_id, 'wp_review_author', true );
 
 	// Normalize the rating based on review type.
-	$normalized_rating = scorebox_normalize_wp_review_rating( $rating, $wp_review_type );
+	$normalized_rating = verdix_normalize_wp_review_rating( $rating, $wp_review_type );
 
 	// Parse pros/cons from HTML.
-	$pros = scorebox_parse_list_html( $pros_html );
-	$cons = scorebox_parse_list_html( $cons_html );
+	$pros = verdix_parse_list_html( $pros_html );
+	$cons = verdix_parse_list_html( $cons_html );
 
 	// Map schema type.
-	$schema_type = scorebox_map_schema_type( $schema );
-
-	// Migrate multi-criteria ratings from wp_review_item.
-	$criteria     = array();
-	$use_criteria = false;
-	$review_items = get_post_meta( $post_id, 'wp_review_item', true );
-	if ( ! empty( $review_items ) && is_array( $review_items ) ) {
-		foreach ( $review_items as $item ) {
-			$label    = '';
-			$c_rating = 0;
-
-			if ( ! empty( $item['wp_review_item_title'] ) ) {
-				$label = $item['wp_review_item_title'];
-			}
-
-			if ( ! empty( $item['wp_review_item_star'] ) ) {
-				$c_rating = floatval( $item['wp_review_item_star'] );
-			}
-
-			// Normalize criterion rating based on review type (same scale as overall).
-			$c_rating = scorebox_normalize_wp_review_rating( $c_rating, $wp_review_type );
-
-			if ( ! empty( $label ) ) {
-				$criteria[] = array(
-					'label'  => sanitize_text_field( $label ),
-					'rating' => $c_rating,
-				);
-			}
-		}
-		if ( ! empty( $criteria ) ) {
-			$use_criteria = true;
-		}
-	}
+	$schema_type = verdix_map_schema_type( $schema );
 
 	$data = array(
 		'rating'       => $normalized_rating,
-		'rating_type'  => 'star', // Always convert to star scale.
+		'rating_type'  => 'star',
 		'position'     => '',
 		'heading'      => $heading ?: '',
 		'summary'      => $desc ?: '',
@@ -207,11 +167,9 @@ function scorebox_migrate_post_wp_review_pro( $post_id ) {
 		'cta_text'     => $btn_txt ?: '',
 		'cta_url'      => $url ?: '',
 		'author_name'  => $author_name ?: '',
-		'use_criteria' => $use_criteria,
-		'criteria'     => $criteria,
 	);
 
-	scorebox_save_review( $post_id, $data );
+	verdix_save_review( $post_id, $data );
 
 	return true;
 }
@@ -221,13 +179,17 @@ function scorebox_migrate_post_wp_review_pro( $post_id ) {
 // =========================================================================
 
 /**
- * Normalize a WP Review Pro rating to 0-5 scale.
+ * Normalize an incoming WP Review Pro rating to the 0-5 star scale.
  *
- * @param string $rating      Raw rating value.
- * @param string $review_type WP Review Pro review type.
+ * The $review_type values 'point' and 'percentage' are the WP Review Pro source
+ * format identifiers for migrated data, not Verdix Reviews rating modes —
+ * everything is stored on the 0-5 star scale after import.
+ *
+ * @param string $rating      Raw WP Review Pro rating value.
+ * @param string $review_type WP Review Pro review type ('star', 'point', or 'percentage').
  * @return float Normalized rating (0-5, half-star increments).
  */
-function scorebox_normalize_wp_review_rating( $rating, $review_type ) {
+function verdix_normalize_wp_review_rating( $rating, $review_type ) {
 	$value = floatval( $rating );
 
 	switch ( $review_type ) {
@@ -254,7 +216,7 @@ function scorebox_normalize_wp_review_rating( $rating, $review_type ) {
  * @param string $html Raw HTML string.
  * @return array Array of clean text strings.
  */
-function scorebox_parse_list_html( $html ) {
+function verdix_parse_list_html( $html ) {
 	if ( empty( $html ) ) {
 		return array();
 	}
@@ -286,14 +248,14 @@ function scorebox_parse_list_html( $html ) {
 }
 
 /**
- * Map WP Review Pro schema type to ScoreBox schema type.
+ * Map WP Review Pro schema type to Verdix Reviews schema type.
  *
  * @param string $schema WP Review Pro schema value.
- * @return string ScoreBox schema type.
+ * @return string Verdix Reviews schema type.
  */
-function scorebox_map_schema_type( $schema ) {
+function verdix_map_schema_type( $schema ) {
 	// If we natively support this type, pass it through unchanged.
-	$supported = array_keys( scorebox_get_schema_types() );
+	$supported = array_keys( verdix_get_schema_types() );
 	if ( in_array( $schema, $supported, true ) ) {
 		return $schema;
 	}
@@ -327,20 +289,20 @@ function scorebox_map_schema_type( $schema ) {
  * @param WP_Post $post Post object.
  * @return array
  */
-function scorebox_migration_row_wp_review_pro( $post ) {
+function verdix_migration_row_wp_review_pro( $post ) {
 	$review_type = get_post_meta( $post->ID, 'wp_review_type', true );
 	$rating      = get_post_meta( $post->ID, 'wp_review_total', true );
 	$schema      = get_post_meta( $post->ID, 'wp_review_schema', true );
 	$pros_html   = get_post_meta( $post->ID, 'wp_review_pros', true );
 	$cons_html   = get_post_meta( $post->ID, 'wp_review_cons', true );
-	$normalized  = scorebox_normalize_wp_review_rating( $rating, $review_type );
+	$normalized  = verdix_normalize_wp_review_rating( $rating, $review_type );
 
 	return array(
 		'type'   => $review_type,
 		'rating' => $rating . ( (string) $rating !== (string) $normalized ? ' &rarr; ' . $normalized : '' ),
 		'schema' => $schema ?: '-',
-		'pros'   => count( scorebox_parse_list_html( $pros_html ) ),
-		'cons'   => count( scorebox_parse_list_html( $cons_html ) ),
+		'pros'   => count( verdix_parse_list_html( $pros_html ) ),
+		'cons'   => count( verdix_parse_list_html( $cons_html ) ),
 	);
 }
 
@@ -353,7 +315,7 @@ function scorebox_migration_row_wp_review_pro( $post ) {
  *
  * @return WP_Post[] Array of post objects.
  */
-function scorebox_get_migratable_posts() {
+function verdix_get_migratable_posts() {
 	global $wpdb;
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -401,51 +363,51 @@ function scorebox_get_migratable_posts() {
  *
  * @param string $hook_suffix Current admin page.
  */
-function scorebox_migration_enqueue( $hook_suffix ) {
-	if ( 'scorebox_page_scorebox-migration' !== $hook_suffix ) {
+function verdix_migration_enqueue( $hook_suffix ) {
+	if ( 'verdix_page_verdix-migration' !== $hook_suffix ) {
 		return;
 	}
 
 	wp_enqueue_style(
-		'scorebox-admin',
-		SCOREBOX_URL . 'assets/css/admin.css',
+		'verdix-admin',
+		VERDIX_URL . 'assets/css/admin.css',
 		array(),
-		SCOREBOX_VERSION
+		VERDIX_VERSION
 	);
 
 	wp_enqueue_script(
-		'scorebox-migration',
-		SCOREBOX_URL . 'assets/js/migration.js',
+		'verdix-migration',
+		VERDIX_URL . 'assets/js/migration.js',
 		array(),
-		SCOREBOX_VERSION,
+		VERDIX_VERSION,
 		true
 	);
 
 	wp_localize_script(
-		'scorebox-migration',
-		'scoreboxMigration',
+		'verdix-migration',
+		'verdixMigration',
 		array(
-			'nonce'   => wp_create_nonce( 'scorebox_migrate' ),
+			'nonce'   => wp_create_nonce( 'verdix_migrate' ),
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 			'i18n'    => array(
-				'migrating'  => __( 'Migrating...', 'scorebox' ),
-				'migrated'   => __( 'Migrated', 'scorebox' ),
-				'error'      => __( 'Error', 'scorebox' ),
-				'confirmAll' => __( 'Migrate all posts? This cannot be undone.', 'scorebox' ),
-				'retry'      => __( 'Retry Migration', 'scorebox' ),
+				'migrating'  => __( 'Migrating...', 'verdix-reviews' ),
+				'migrated'   => __( 'Migrated', 'verdix-reviews' ),
+				'error'      => __( 'Error', 'verdix-reviews' ),
+				'confirmAll' => __( 'Migrate all posts? This cannot be undone.', 'verdix-reviews' ),
+				'retry'      => __( 'Retry Migration', 'verdix-reviews' ),
 			),
 		)
 	);
 }
-add_action( 'admin_enqueue_scripts', 'scorebox_migration_enqueue' );
+add_action( 'admin_enqueue_scripts', 'verdix_migration_enqueue' );
 
 /**
  * Render the migration page.
  */
-function scorebox_migration_page() {
+function verdix_migration_page() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 
-	include SCOREBOX_DIR . 'admin/views/migration-page.php';
+	include VERDIX_DIR . 'admin/views/migration-page.php';
 }

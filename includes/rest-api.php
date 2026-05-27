@@ -1,25 +1,17 @@
 <?php
-/**
- * REST API endpoint for review data.
- *
- * Provides /wp-json/scorebox/v1/review/<post_id> for headless/decoupled use.
- *
- * @package ScoreBox
- */
-
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Register REST API routes.
  */
-function scorebox_register_rest_routes() {
+function verdix_register_rest_routes() {
 	register_rest_route(
-		'scorebox/v1',
+		'verdix/v1',
 		'/review/(?P<id>\d+)',
 		array(
 			array(
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => 'scorebox_rest_get_review',
+				'callback'            => 'verdix_rest_get_review',
 				'permission_callback' => function ( $request ) {
 					$post = get_post( $request->get_param( 'id' ) );
 					if ( ! $post ) {
@@ -41,7 +33,7 @@ function scorebox_register_rest_routes() {
 			),
 			array(
 				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => 'scorebox_rest_update_review',
+				'callback'            => 'verdix_rest_update_review',
 				'permission_callback' => function ( $request ) {
 					return current_user_can( 'edit_post', $request->get_param( 'id' ) );
 				},
@@ -57,7 +49,7 @@ function scorebox_register_rest_routes() {
 		)
 	);
 }
-add_action( 'rest_api_init', 'scorebox_register_rest_routes' );
+add_action( 'rest_api_init', 'verdix_register_rest_routes' );
 
 /**
  * GET handler — return review data for a post.
@@ -65,19 +57,19 @@ add_action( 'rest_api_init', 'scorebox_register_rest_routes' );
  * @param WP_REST_Request $request Request object.
  * @return WP_REST_Response|WP_Error
  */
-function scorebox_rest_get_review( $request ) {
+function verdix_rest_get_review( $request ) {
 	$post_id = $request->get_param( 'id' );
 	$post    = get_post( $post_id );
 
 	if ( ! $post ) {
 		return new WP_Error(
-			'scorebox_not_found',
-			__( 'Post not found.', 'scorebox' ),
+			'verdix_not_found',
+			__( 'Post not found.', 'verdix-reviews' ),
 			array( 'status' => 404 )
 		);
 	}
 
-	$review = scorebox_get_review( $post_id );
+	$review = verdix_get_review( $post_id );
 
 	if ( ! $review ) {
 		return new WP_REST_Response(
@@ -93,7 +85,7 @@ function scorebox_rest_get_review( $request ) {
 		array(
 			'post_id' => $post_id,
 			'review'  => $review,
-			'schema'  => scorebox_build_schema( $post_id, $review ),
+			'schema'  => verdix_build_schema( $post_id, $review ),
 		),
 		200
 	);
@@ -105,14 +97,14 @@ function scorebox_rest_get_review( $request ) {
  * @param WP_REST_Request $request Request object.
  * @return WP_REST_Response|WP_Error
  */
-function scorebox_rest_update_review( $request ) {
+function verdix_rest_update_review( $request ) {
 	$post_id = $request->get_param( 'id' );
 	$post    = get_post( $post_id );
 
 	if ( ! $post ) {
 		return new WP_Error(
-			'scorebox_not_found',
-			__( 'Post not found.', 'scorebox' ),
+			'verdix_not_found',
+			__( 'Post not found.', 'verdix-reviews' ),
 			array( 'status' => 404 )
 		);
 	}
@@ -120,14 +112,14 @@ function scorebox_rest_update_review( $request ) {
 	$body = $request->get_json_params();
 	if ( empty( $body ) ) {
 		return new WP_Error(
-			'scorebox_invalid_data',
-			__( 'Invalid review data.', 'scorebox' ),
+			'verdix_invalid_data',
+			__( 'Invalid review data.', 'verdix-reviews' ),
 			array( 'status' => 400 )
 		);
 	}
 
-	scorebox_save_review( $post_id, $body );
-	$review = scorebox_get_review( $post_id );
+	verdix_save_review( $post_id, $body );
+	$review = verdix_get_review( $post_id );
 
 	return new WP_REST_Response(
 		array(
