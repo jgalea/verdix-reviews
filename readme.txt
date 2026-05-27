@@ -63,6 +63,10 @@ Set a global default position in Verdix Reviews > Settings (before content, afte
 
 In `<head>` on singular post/page views that have review data. The schema is normalized to a 0-5 ratingValue and includes both `review` and `aggregateRating` for compatibility with Google rich results.
 
+== Screenshots ==
+
+1. The frontend review box: star rating, summary, and pros/cons rendered on a single post.
+
 == Changelog ==
 
 = 2.0.1 =
