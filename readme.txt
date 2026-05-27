@@ -2,7 +2,7 @@
 Contributors: jeangalea
 Tags: review, rating, schema, structured data, stars
 Requires at least: 6.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
 Stable tag: 2.0.1
 License: GPLv2 or later
