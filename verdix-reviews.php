@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Verdix Reviews
  * Description: Review boxes with structured data (JSON-LD) for WordPress. Star ratings, pros/cons, and schema markup that Google understands.
- * Version:     2.0.1
+ * Version:     2.0.2
  * Author:      Jean Galea
  * Author URI:  https://jeangalea.com/
  * License:     GPL-2.0-or-later
@@ -15,7 +15,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'VERDIX_VERSION', '2.0.1' );
+define( 'VERDIX_VERSION', '2.0.2' );
 define( 'VERDIX_FILE', __FILE__ );
 define( 'VERDIX_DIR', plugin_dir_path( __FILE__ ) );
 define( 'VERDIX_URL', plugin_dir_url( __FILE__ ) );

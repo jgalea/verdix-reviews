@@ -4,7 +4,7 @@ Tags: review, rating, schema, structured data, stars
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -68,6 +68,10 @@ In `<head>` on singular post/page views that have review data. The schema is nor
 1. The frontend review box: star rating, summary, and pros/cons rendered on a single post.
 
 == Changelog ==
+
+= 2.0.2 =
+* Fixed JSON-LD: removed a duplicate bare Product node and a conflicting itemReviewed field that caused Google "Product snippets" and "Review snippets" validation errors.
+* Review author now always has a name, falling back to the site name, to satisfy Google's required author field.
 
 = 2.0.1 =
 * Moved meta-box schema-type toggle script out of the template and into the enqueued meta-box.js.

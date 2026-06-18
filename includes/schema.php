@@ -151,6 +151,11 @@ function verdix_build_schema( $post_id, $review ) {
 		$author_name = $author ? $author->display_name : '';
 	}
 
+	// Final fallback so the Review author always has a name (required by Google).
+	if ( '' === $author_name ) {
+		$author_name = get_bloginfo( 'name' );
+	}
+
 	// Product name: review-level override > post title.
 	$product_name = ! empty( $review['product_name'] ) ? $review['product_name'] : get_the_title( $post_id );
 
@@ -167,10 +172,6 @@ function verdix_build_schema( $post_id, $review ) {
 		'review'          => array(
 			'@type'        => 'Review',
 			'name'         => $review_name,
-			'itemReviewed' => array(
-				'@type' => $schema_type,
-				'name'  => $product_name,
-			),
 			'author'       => array(
 				'@type' => 'Person',
 				'name'  => $author_name,

@@ -1,0 +1,9 @@
+# Files and directories that should not ship to the WordPress.org package.
+/.git
+/.github
+/.claude
+/.gitignore
+/.distignore
+/CLAUDE.md
+/PRD.md
+/docs
