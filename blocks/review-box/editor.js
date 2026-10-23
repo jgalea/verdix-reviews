@@ -13,6 +13,8 @@
 	var SelectControl = wp.components.SelectControl;
 	var RangeControl = wp.components.RangeControl;
 	var Button = wp.components.Button;
+	var ComboboxControl = wp.components.ComboboxControl;
+	var useSelect = wp.data.useSelect;
 	var useState = wp.element.useState;
 	var useEffect = wp.element.useEffect;
 
@@ -28,7 +30,8 @@
 	var DEFAULTS = window.verdixDefaults || {
 		rating: 0, rating_type: 'star', style: '', position: '', heading: '', summary: '', pros: [], cons: [],
 		schema_type: 'Product', product_name: '', price: '', currency: 'USD',
-		cta_text: '', cta_url: '', author_name: '', type_fields: {}
+		cta_text: '', cta_url: '', offers: [], disclosure: '', disclosure_text: '', last_tested: '',
+		author_name: '', type_fields: {}
 	};
 
 	var starIdCounter = 0;
@@ -134,6 +137,91 @@
 		);
 
 		return el( 'div', { className: 'verdix-list-editor' }, children );
+	}
+
+	var CURRENCIES = [
+		{ label: 'USD', value: 'USD' },
+		{ label: 'EUR', value: 'EUR' },
+		{ label: 'GBP', value: 'GBP' }
+	];
+
+	function KatinaPicker( props ) {
+		var searchHook = useState( '' );
+		var search = searchHook[ 0 ];
+		var setSearch = searchHook[ 1 ];
+
+		var records = useSelect( function( select ) {
+			var core = select( 'core' );
+			var list = core.getEntityRecords( 'postType', 'katina_link', { per_page: 20, search: search, status: 'publish' } ) || [];
+			var options = list.map( function( r ) {
+				return { value: String( r.id ), label: r.title && r.title.rendered ? r.title.rendered : '#' + r.id };
+			} );
+			if ( props.value && ! options.some( function( o ) { return o.value === String( props.value ); } ) ) {
+				var current = core.getEntityRecord( 'postType', 'katina_link', props.value );
+				options.unshift( {
+					value: String( props.value ),
+					label: current && current.title ? current.title.rendered : '#' + props.value
+				} );
+			}
+			return options;
+		}, [ search, props.value ] );
+
+		return el( ComboboxControl, {
+			label: __( 'Katina link', 'verdix-reviews' ),
+			value: props.value ? String( props.value ) : null,
+			options: records,
+			onFilterValueChange: setSearch,
+			onChange: function( val ) { props.onChange( val ? parseInt( val, 10 ) : 0 ); },
+			__nextHasNoMarginBottom: true
+		} );
+	}
+
+	function OfferEditor( props ) {
+		var offer = props.offer;
+		var change = props.onChange;
+
+		var fields = [
+			el( TextControl, {
+				key: 'merchant', label: __( 'Merchant', 'verdix-reviews' ), value: offer.merchant,
+				onChange: function( val ) { change( { merchant: val } ); }
+			} ),
+			el( TextControl, {
+				key: 'price', label: __( 'Price', 'verdix-reviews' ), value: offer.price, placeholder: '49.99',
+				onChange: function( val ) { change( { price: val } ); }
+			} ),
+			el( SelectControl, {
+				key: 'currency', label: __( 'Currency', 'verdix-reviews' ), value: offer.currency,
+				options: CURRENCIES.some( function( c ) { return c.value === offer.currency; } )
+					? CURRENCIES
+					: CURRENCIES.concat( [ { label: offer.currency, value: offer.currency } ] ),
+				onChange: function( val ) { change( { currency: val } ); }
+			} ),
+			el( TextControl, {
+				key: 'cta_text', label: __( 'Button Text', 'verdix-reviews' ), value: offer.cta_text,
+				placeholder: __( 'Check price', 'verdix-reviews' ),
+				onChange: function( val ) { change( { cta_text: val } ); }
+			} )
+		];
+
+		if ( CONFIG.katinaActive ) {
+			fields.push( el( KatinaPicker, {
+				key: 'katina', value: offer.katina_link,
+				onChange: function( val ) { change( { katina_link: val } ); }
+			} ) );
+		}
+
+		fields.push(
+			el( TextControl, {
+				key: 'url', label: __( 'URL', 'verdix-reviews' ), value: offer.url, type: 'url', placeholder: 'https://',
+				help: offer.katina_link ? __( 'The Katina link is used instead.', 'verdix-reviews' ) : '',
+				onChange: function( val ) { change( { url: val } ); }
+			} ),
+			el( Button, {
+				key: 'remove', variant: 'tertiary', isDestructive: true, size: 'small', onClick: props.onRemove
+			}, __( 'Remove offer', 'verdix-reviews' ) )
+		);
+
+		return el( 'div', { className: 'verdix-offer-editor' }, fields );
 	}
 
 	function RatingInput( props ) {
@@ -388,6 +476,59 @@
 					onChange: function( val ) { updateReview( { cta_url: val } ); },
 					placeholder: 'https://',
 					type: 'url'
+				} )
+			)
+		);
+
+		var offers = Array.isArray( review.offers ) ? review.offers : [];
+		function updateOffer( index, changes ) {
+			updateReview( { offers: offers.map( function( o, i ) { return i === index ? Object.assign( {}, o, changes ) : o; } ) } );
+		}
+
+		inspectorPanels.push(
+			el( PanelBody, { key: 'offers', title: __( 'Offers', 'verdix-reviews' ), initialOpen: false },
+				el( 'p', { className: 'components-base-control__help' },
+					__( 'Add several offers to list one button per merchant. With none, the price and button above are used.', 'verdix-reviews' )
+				),
+				offers.map( function( offer, index ) {
+					return el( OfferEditor, {
+						key: index,
+						offer: offer,
+						onChange: function( changes ) { updateOffer( index, changes ); },
+						onRemove: function() { updateReview( { offers: offers.filter( function( _, i ) { return i !== index; } ) } ); }
+					} );
+				} ),
+				el( Button, {
+					variant: 'secondary',
+					onClick: function() {
+						updateReview( { offers: offers.concat( [ { merchant: '', price: '', currency: 'USD', url: '', cta_text: '', katina_link: 0 } ] ) } );
+					}
+				}, __( '+ Add offer', 'verdix-reviews' ) )
+			)
+		);
+
+		var disclosureOptions = [ { label: __( 'Use global default', 'verdix-reviews' ), value: '' } ].concat( CONFIG.disclosureTypes || [] );
+		var presetText = ( CONFIG.disclosurePresets || {} )[ review.disclosure ];
+
+		inspectorPanels.push(
+			el( PanelBody, { key: 'disclosure', title: __( 'Disclosure and testing', 'verdix-reviews' ), initialOpen: false },
+				el( SelectControl, {
+					label: __( 'Disclosure', 'verdix-reviews' ),
+					value: review.disclosure || '',
+					options: disclosureOptions,
+					help: presetText || '',
+					onChange: function( val ) { updateReview( { disclosure: val } ); }
+				} ),
+				review.disclosure === 'custom' ? el( TextareaControl, {
+					label: __( 'Custom disclosure text', 'verdix-reviews' ),
+					value: review.disclosure_text,
+					onChange: function( val ) { updateReview( { disclosure_text: val } ); }
+				} ) : null,
+				el( TextControl, {
+					label: __( 'Last tested', 'verdix-reviews' ),
+					type: 'date',
+					value: review.last_tested,
+					onChange: function( val ) { updateReview( { last_tested: val } ); }
 				} )
 			)
 		);

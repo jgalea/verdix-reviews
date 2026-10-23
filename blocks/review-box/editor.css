@@ -116,3 +116,12 @@
 	margin-top: 4px;
 	font-size: 12px;
 }
+
+.verdix-offer-editor {
+	margin-bottom: 16px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #ddd;
+}
+.verdix-offer-editor .components-combobox-control {
+	margin-bottom: 16px;
+}

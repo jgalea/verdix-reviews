@@ -85,6 +85,14 @@ function verdix_register_settings() {
 	);
 
 	add_settings_field(
+		'default_disclosure',
+		__( 'Default Disclosure', 'verdix-reviews' ),
+		'verdix_field_disclosure',
+		'verdix-settings',
+		'verdix_general'
+	);
+
+	add_settings_field(
 		'default_position',
 		__( 'Default Review Position', 'verdix-reviews' ),
 		'verdix_field_position',
@@ -150,6 +158,16 @@ function verdix_sanitize_settings( $input ) {
 	$output['default_author_name'] = '';
 	if ( isset( $input['default_author_name'] ) ) {
 		$output['default_author_name'] = sanitize_text_field( $input['default_author_name'] );
+	}
+
+	$output['default_disclosure'] = 'none';
+	if ( isset( $input['default_disclosure'] ) && isset( verdix_get_disclosure_types()[ $input['default_disclosure'] ] ) ) {
+		$output['default_disclosure'] = $input['default_disclosure'];
+	}
+
+	$output['default_disclosure_text'] = '';
+	if ( isset( $input['default_disclosure_text'] ) ) {
+		$output['default_disclosure_text'] = sanitize_textarea_field( $input['default_disclosure_text'] );
 	}
 
 	$valid_positions = array( 'bottom', 'top', 'both', 'manual' );
@@ -230,6 +248,24 @@ function verdix_field_author_name() {
 		value="<?php echo esc_attr( $value ); ?>" class="regular-text"
 		placeholder="<?php esc_attr_e( 'e.g., John Smith', 'verdix-reviews' ); ?>">
 	<p class="description"><?php esc_html_e( 'Used in JSON-LD schema as review author. Falls back to post author if empty.', 'verdix-reviews' ); ?></p>
+	<?php
+}
+
+function verdix_field_disclosure() {
+	$options = get_option( 'verdix_settings', array() );
+	$current = isset( $options['default_disclosure'] ) ? $options['default_disclosure'] : 'none';
+	$text    = isset( $options['default_disclosure_text'] ) ? $options['default_disclosure_text'] : '';
+	?>
+	<select name="verdix_settings[default_disclosure]" id="verdix_default_disclosure">
+		<?php foreach ( verdix_get_disclosure_types() as $type_value => $type_label ) : ?>
+			<option value="<?php echo esc_attr( $type_value ); ?>" <?php selected( $current, $type_value ); ?>><?php echo esc_html( $type_label ); ?></option>
+		<?php endforeach; ?>
+	</select>
+	<p>
+		<textarea name="verdix_settings[default_disclosure_text]" id="verdix_default_disclosure_text" rows="2" class="large-text"
+			placeholder="<?php esc_attr_e( 'Text for the Custom option', 'verdix-reviews' ); ?>"><?php echo esc_textarea( $text ); ?></textarea>
+	</p>
+	<p class="description"><?php esc_html_e( 'Shown in every review box that does not set its own disclosure. Google requires disclosing incentivized reviews.', 'verdix-reviews' ); ?></p>
 	<?php
 }
 

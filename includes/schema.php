@@ -199,6 +199,10 @@ function verdix_build_schema( $post_id, $review ) {
 	// Add datePublished.
 	$schema['review']['datePublished'] = get_the_date( 'c', $post_id );
 
+	if ( ! empty( $review['last_tested'] ) ) {
+		$schema['review']['dateModified'] = $review['last_tested'];
+	}
+
 	// Add description from post excerpt or summary.
 	if ( ! empty( $review['summary'] ) ) {
 		$schema['description'] = $review['summary'];
@@ -246,14 +250,9 @@ function verdix_build_schema( $post_id, $review ) {
  * @return array Modified schema.
  */
 function verdix_schema_product( $schema, $review ) {
-	if ( ! empty( $review['price'] ) ) {
-		$schema['offers'] = array(
-			'@type'         => 'Offer',
-			'url'           => $schema['url'],
-			'price'         => $review['price'],
-			'priceCurrency' => ! empty( $review['currency'] ) ? $review['currency'] : 'USD',
-			'availability'  => 'https://schema.org/InStock',
-		);
+	$offers = verdix_schema_offers( $schema['url'], $review, 'https://schema.org/InStock' );
+	if ( $offers ) {
+		$schema['offers'] = $offers;
 	}
 
 	if ( ! empty( $review['product_name'] ) ) {
@@ -264,6 +263,58 @@ function verdix_schema_product( $schema, $review ) {
 	}
 
 	return $schema;
+}
+
+function verdix_schema_offers( $default_url, $review, $availability = '' ) {
+	$items = array();
+
+	foreach ( verdix_get_offers( $review ) as $offer ) {
+		if ( '' === (string) $offer['price'] ) {
+			continue;
+		}
+
+		$item = array(
+			'@type'         => 'Offer',
+			'url'           => $offer['href'] ? $offer['href'] : $default_url,
+			'price'         => $offer['price'],
+			'priceCurrency' => ! empty( $offer['currency'] ) ? $offer['currency'] : 'USD',
+		);
+		if ( $availability ) {
+			$item['availability'] = $availability;
+		}
+		if ( ! empty( $offer['merchant'] ) ) {
+			$item['seller'] = array(
+				'@type' => 'Organization',
+				'name'  => $offer['merchant'],
+			);
+		}
+		$items[] = $item;
+	}
+
+	if ( count( $items ) < 2 ) {
+		return $items ? $items[0] : array();
+	}
+
+	$currency = $items[0]['priceCurrency'];
+	$prices   = array();
+	foreach ( $items as $item ) {
+		if ( $item['priceCurrency'] === $currency && is_numeric( $item['price'] ) ) {
+			$prices[] = (float) $item['price'];
+		}
+	}
+
+	$aggregate = array(
+		'@type'         => 'AggregateOffer',
+		'priceCurrency' => $currency,
+		'offerCount'    => count( $items ),
+		'offers'        => $items,
+	);
+	if ( $prices ) {
+		$aggregate['lowPrice']  = min( $prices );
+		$aggregate['highPrice'] = max( $prices );
+	}
+
+	return $aggregate;
 }
 
 /**
@@ -328,13 +379,9 @@ function verdix_schema_apply_type_fields( $schema, $schema_type, $review ) {
 function verdix_schema_software( $schema, $review ) {
 	$schema['applicationCategory'] = 'WebApplication';
 
-	if ( ! empty( $review['price'] ) ) {
-		$schema['offers'] = array(
-			'@type'         => 'Offer',
-			'url'           => $schema['url'],
-			'price'         => $review['price'],
-			'priceCurrency' => ! empty( $review['currency'] ) ? $review['currency'] : 'USD',
-		);
+	$offers = verdix_schema_offers( $schema['url'], $review );
+	if ( $offers ) {
+		$schema['offers'] = $offers;
 	}
 
 	return $schema;

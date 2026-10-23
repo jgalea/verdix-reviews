@@ -86,6 +86,8 @@ function verdix_rest_get_review( $request ) {
 			'post_id' => $post_id,
 			'review'  => $review,
 			'schema'  => verdix_build_schema( $post_id, $review ),
+			'offers'          => verdix_get_offers( $review ),
+			'disclosure_text' => verdix_get_disclosure_text( $review ),
 		),
 		200
 	);

@@ -161,6 +161,71 @@ if ( empty( $cons ) ) {
 					placeholder="https://">
 			</td>
 		</tr>
+
+		<tr>
+			<th scope="row"><?php esc_html_e( 'Offers', 'verdix-reviews' ); ?></th>
+			<td>
+				<?php
+				$katina_links = verdix_katina_active()
+					? get_posts(
+						array(
+							'post_type'      => 'katina_link',
+							'post_status'    => 'publish',
+							'posts_per_page' => 200,
+							'orderby'        => 'title',
+							'order'          => 'ASC',
+						)
+					)
+					: array();
+				$offer_blank  = array(
+					'merchant'    => '',
+					'price'       => '',
+					'currency'    => 'USD',
+					'url'         => '',
+					'cta_text'    => '',
+					'katina_link' => 0,
+				);
+				$saved_offers = is_array( $data['offers'] ) ? array_values( $data['offers'] ) : array();
+				?>
+				<div class="verdix-offers" data-next="<?php echo esc_attr( count( $saved_offers ) ); ?>">
+					<?php foreach ( $saved_offers as $offer_index => $offer ) : ?>
+						<?php verdix_meta_box_offer_row( $offer_index, wp_parse_args( $offer, $offer_blank ), $katina_links ); ?>
+					<?php endforeach; ?>
+				</div>
+				<template id="verdix-offer-template">
+					<?php verdix_meta_box_offer_row( '__INDEX__', $offer_blank, $katina_links ); ?>
+				</template>
+				<button type="button" class="button verdix-offers__add"><?php esc_html_e( '+ Add Offer', 'verdix-reviews' ); ?></button>
+				<p class="description"><?php esc_html_e( 'Several offers are listed as separate buttons. With none, the price and CTA fields are used.', 'verdix-reviews' ); ?></p>
+			</td>
+		</tr>
+
+		<tr>
+			<th scope="row">
+				<label for="verdix_review_disclosure"><?php esc_html_e( 'Disclosure', 'verdix-reviews' ); ?></label>
+			</th>
+			<td>
+				<select id="verdix_review_disclosure" name="verdix_review_disclosure">
+					<option value="" <?php selected( $data['disclosure'], '' ); ?>><?php esc_html_e( 'Use global default', 'verdix-reviews' ); ?></option>
+					<?php foreach ( verdix_get_disclosure_types() as $disclosure_value => $disclosure_label ) : ?>
+						<option value="<?php echo esc_attr( $disclosure_value ); ?>" <?php selected( $data['disclosure'], $disclosure_value ); ?>><?php echo esc_html( $disclosure_label ); ?></option>
+					<?php endforeach; ?>
+				</select>
+				<p>
+					<textarea id="verdix_review_disclosure_text" name="verdix_review_disclosure_text" rows="2" class="large-text"
+						placeholder="<?php esc_attr_e( 'Custom disclosure text', 'verdix-reviews' ); ?>"><?php echo esc_textarea( $data['disclosure_text'] ); ?></textarea>
+				</p>
+			</td>
+		</tr>
+
+		<tr>
+			<th scope="row">
+				<label for="verdix_review_last_tested"><?php esc_html_e( 'Last Tested', 'verdix-reviews' ); ?></label>
+			</th>
+			<td>
+				<input type="date" id="verdix_review_last_tested" name="verdix_review_last_tested" value="<?php echo esc_attr( $data['last_tested'] ); ?>">
+			</td>
+		</tr>
 	</table>
 
 	<hr>

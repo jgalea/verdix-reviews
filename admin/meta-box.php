@@ -55,6 +55,33 @@ function verdix_meta_box_render( $post ) {
 	include VERDIX_DIR . 'admin/views/meta-box.php';
 }
 
+function verdix_meta_box_offer_row( $index, $offer, $katina_links ) {
+	$name       = 'verdix_review_offers[' . $index . ']';
+	$currencies = array_unique( array( 'USD', 'EUR', 'GBP', $offer['currency'] ) );
+	?>
+	<div class="verdix-offer">
+		<input type="text" name="<?php echo esc_attr( $name ); ?>[merchant]" value="<?php echo esc_attr( $offer['merchant'] ); ?>" placeholder="<?php esc_attr_e( 'Merchant', 'verdix-reviews' ); ?>">
+		<input type="text" name="<?php echo esc_attr( $name ); ?>[price]" value="<?php echo esc_attr( $offer['price'] ); ?>" class="verdix-offer__price" placeholder="<?php esc_attr_e( 'Price', 'verdix-reviews' ); ?>">
+		<select name="<?php echo esc_attr( $name ); ?>[currency]">
+			<?php foreach ( $currencies as $code ) : ?>
+				<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $offer['currency'], $code ); ?>><?php echo esc_html( $code ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<input type="text" name="<?php echo esc_attr( $name ); ?>[cta_text]" value="<?php echo esc_attr( $offer['cta_text'] ); ?>" placeholder="<?php esc_attr_e( 'Button text', 'verdix-reviews' ); ?>">
+		<input type="url" name="<?php echo esc_attr( $name ); ?>[url]" value="<?php echo esc_url( $offer['url'] ); ?>" class="verdix-offer__url" placeholder="https://">
+		<?php if ( $katina_links ) : ?>
+			<select name="<?php echo esc_attr( $name ); ?>[katina_link]" class="verdix-offer__katina">
+				<option value="0"><?php esc_html_e( 'No Katina link', 'verdix-reviews' ); ?></option>
+				<?php foreach ( $katina_links as $link ) : ?>
+					<option value="<?php echo esc_attr( $link->ID ); ?>" <?php selected( (int) $offer['katina_link'], $link->ID ); ?>><?php echo esc_html( $link->post_title ); ?></option>
+				<?php endforeach; ?>
+			</select>
+		<?php endif; ?>
+		<button type="button" class="button verdix-offer__remove" aria-label="<?php esc_attr_e( 'Remove', 'verdix-reviews' ); ?>">&times;</button>
+	</div>
+	<?php
+}
+
 /**
  * Save meta box data.
  *
@@ -97,6 +124,9 @@ function verdix_save_meta_box( $post_id ) {
 		'currency'     => isset( $_POST['verdix_review_currency'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_currency'] ) ) : 'USD',
 		'cta_text'     => isset( $_POST['verdix_review_cta_text'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_cta_text'] ) ) : '',
 		'cta_url'      => isset( $_POST['verdix_review_cta_url'] ) ? esc_url_raw( wp_unslash( $_POST['verdix_review_cta_url'] ) ) : '',
+		'disclosure'      => isset( $_POST['verdix_review_disclosure'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_disclosure'] ) ) : '',
+		'disclosure_text' => isset( $_POST['verdix_review_disclosure_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['verdix_review_disclosure_text'] ) ) : '',
+		'last_tested'     => isset( $_POST['verdix_review_last_tested'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_last_tested'] ) ) : '',
 		'author_name'  => isset( $_POST['verdix_review_author_name'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_author_name'] ) ) : '',
 	);
 
@@ -106,6 +136,11 @@ function verdix_save_meta_box( $post_id ) {
 	$data['type_fields'] = array();
 	if ( isset( $_POST['verdix_review_type_fields'] ) && is_array( $_POST['verdix_review_type_fields'] ) ) {
 		$data['type_fields'] = wp_unslash( $_POST['verdix_review_type_fields'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized downstream.
+	}
+
+	$data['offers'] = array();
+	if ( isset( $_POST['verdix_review_offers'] ) && is_array( $_POST['verdix_review_offers'] ) ) {
+		$data['offers'] = wp_unslash( $_POST['verdix_review_offers'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized downstream in verdix_sanitize_offers().
 	}
 
 	// Parse pros from repeater input array.

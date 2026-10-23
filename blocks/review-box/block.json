@@ -15,7 +15,6 @@
 		"align": [ "wide", "full" ]
 	},
 	"usesContext": [ "postId", "postType" ],
-	"editorScript": "file:./editor.js",
 	"editorStyle": "file:./editor.css",
 	"style": "file:../../assets/css/review-box.css"
 }
