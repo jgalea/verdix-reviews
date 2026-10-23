@@ -183,14 +183,19 @@ function verdix_build_schema( $post_id, $review ) {
 				'worstRating' => '1',
 			),
 		),
-		'aggregateRating' => array(
-			'@type'       => 'AggregateRating',
-			'ratingValue' => (string) $schema_rating,
-			'reviewCount' => '1',
-			'bestRating'  => '5',
-			'worstRating' => '1',
-		),
 	);
+
+	/**
+	 * Filter the aggregateRating for a review. Must come from visitor ratings, not the author's score.
+	 *
+	 * @param array|null $aggregate Schema.org AggregateRating array, or null for none.
+	 * @param int        $post_id   Post ID.
+	 * @param array      $review    Review data.
+	 */
+	$aggregate = apply_filters( 'verdix_schema_aggregate_rating', null, $post_id, $review );
+	if ( ! empty( $aggregate ) && is_array( $aggregate ) ) {
+		$schema['aggregateRating'] = $aggregate;
+	}
 
 	if ( ! empty( $review['summary'] ) ) {
 		$schema['review']['reviewBody'] = $review['summary'];

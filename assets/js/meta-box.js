@@ -33,9 +33,15 @@
 
 		var groups = document.querySelectorAll( '.verdix-type-fields' );
 		var empty  = document.querySelector( '.verdix-type-fields-empty' );
+		var note   = document.querySelector( '.verdix-schema-type-note' );
 
 		select.addEventListener( 'change', function( e ) {
 			var val   = e.target.value;
+			if ( note ) {
+				var message = select.options[ select.selectedIndex ].getAttribute( 'data-note' ) || '';
+				note.textContent = message;
+				note.style.display = message ? '' : 'none';
+			}
 			var found = false;
 			groups.forEach( function( g ) {
 				var match = g.getAttribute( 'data-type' ) === val;

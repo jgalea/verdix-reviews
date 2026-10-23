@@ -24,6 +24,7 @@ define( 'VERDIX_BASENAME', plugin_basename( __FILE__ ) );
 require_once VERDIX_DIR . 'includes/meta.php';
 require_once VERDIX_DIR . 'includes/hooks.php';
 require_once VERDIX_DIR . 'includes/schema.php';
+require_once VERDIX_DIR . 'includes/schema-check.php';
 require_once VERDIX_DIR . 'includes/rest-api.php';
 require_once VERDIX_DIR . 'includes/block.php';
 require_once VERDIX_DIR . 'includes/render.php';

@@ -173,9 +173,12 @@ if ( empty( $cons ) ) {
 			<td>
 				<select id="verdix_review_schema_type" name="verdix_review_schema_type">
 					<?php foreach ( verdix_get_schema_types() as $type_value => $type_label ) : ?>
-						<option value="<?php echo esc_attr( $type_value ); ?>" <?php selected( $data['schema_type'], $type_value ); ?>><?php echo esc_html( $type_label ); ?></option>
+						<?php $eligibility = verdix_schema_eligibility( $type_value ); ?>
+						<option value="<?php echo esc_attr( $type_value ); ?>" data-eligibility="<?php echo esc_attr( $eligibility['status'] ); ?>" data-note="<?php echo esc_attr( $eligibility['message'] ); ?>" <?php selected( $data['schema_type'], $type_value ); ?>><?php echo esc_html( $type_label ); ?></option>
 					<?php endforeach; ?>
 				</select>
+				<?php $current_eligibility = verdix_schema_eligibility( $data['schema_type'] ); ?>
+				<p class="description verdix-schema-type-note" style="color:#b32d2e;<?php echo '' === $current_eligibility['message'] ? 'display:none;' : ''; ?>"><?php echo esc_html( $current_eligibility['message'] ); ?></p>
 			</td>
 		</tr>
 
@@ -268,5 +271,10 @@ if ( empty( $cons ) ) {
 			</td>
 		</tr>
 	</table>
+
+<hr>
+	<h4><?php esc_html_e( 'Schema check', 'verdix-reviews' ); ?></h4>
+	<?php verdix_schema_check_render( $post->ID ); ?>
+	<p class="description"><?php esc_html_e( 'Based on the last saved version.', 'verdix-reviews' ); ?></p>
 
 </div>

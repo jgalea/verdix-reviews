@@ -111,9 +111,12 @@ function verdix_get_editor_config() {
 
 	$schema_types_config = array();
 	foreach ( verdix_get_schema_types() as $slug => $label ) {
+		$eligibility           = verdix_schema_eligibility( $slug );
 		$schema_types_config[] = array(
-			'value' => $slug,
-			'label' => $label,
+			'value'       => $slug,
+			'label'       => $label,
+			'eligibility' => $eligibility['status'],
+			'note'        => $eligibility['message'],
 		);
 	}
 

@@ -77,3 +77,8 @@
 	flex: 0 0 80px;
 	width: 80px;
 }
+
+.verdix-schema-check { margin: 0 0 8px; padding: 0; list-style: none; }
+.verdix-schema-check__item { margin: 0 0 4px; padding: 6px 10px; border-left: 4px solid #72aee6; background: #f6f7f7; }
+.verdix-schema-check__item--error { border-left-color: #d63638; }
+.verdix-schema-check__item--warning { border-left-color: #dba617; }

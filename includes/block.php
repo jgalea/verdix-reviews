@@ -15,7 +15,7 @@ function verdix_register_block() {
 	wp_register_script(
 		'verdix-editor',
 		VERDIX_URL . 'blocks/review-box/editor.js',
-		array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n', 'wp-core-data' ),
+		array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n', 'wp-core-data', 'wp-data', 'wp-api-fetch' ),
 		VERDIX_VERSION,
 		true
 	);

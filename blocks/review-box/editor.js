@@ -15,6 +15,9 @@
 	var Button = wp.components.Button;
 	var useState = wp.element.useState;
 	var useEffect = wp.element.useEffect;
+	var useSelect = wp.data.useSelect;
+	var apiFetch = wp.apiFetch;
+	var Notice = wp.components.Notice;
 
 	var STAR_PATH = 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z';
 
@@ -173,6 +176,79 @@
 		);
 	}
 
+	function SchemaCheck() {
+		var postId = useSelect( function( select ) { return select( 'core/editor' ).getCurrentPostId(); }, [] );
+		var isSaving = useSelect( function( select ) {
+			var editor = select( 'core/editor' );
+			return editor.isSavingPost() && ! editor.isAutosavingPost();
+		}, [] );
+		var state = useState( null );
+		var result = state[ 0 ];
+		var setResult = state[ 1 ];
+		var loadingState = useState( false );
+		var loading = loadingState[ 0 ];
+		var setLoading = loadingState[ 1 ];
+		var errorState = useState( false );
+		var failed = errorState[ 0 ];
+		var setFailed = errorState[ 1 ];
+
+		function run() {
+			setLoading( true );
+			setFailed( false );
+			apiFetch( { path: '/verdix/v1/review/' + postId + '/check' } )
+				.then( setResult )
+				.catch( function() { setFailed( true ); } )
+				.then( function() { setLoading( false ); } );
+		}
+
+		var wasSaving = wp.element.useRef( false );
+		useEffect( function() {
+			var timer;
+			if ( wasSaving.current && ! isSaving ) {
+				timer = setTimeout( run, 600 );
+			}
+			wasSaving.current = isSaving;
+			return function() { clearTimeout( timer ); };
+		}, [ isSaving ] );
+
+		var children = [
+			el( 'p', { key: 'hint', className: 'components-base-control__help' },
+				__( 'Checks the saved version of this post. Runs automatically after saving.', 'verdix-reviews' )
+			),
+			el( Button, { key: 'run', variant: 'secondary', onClick: run, isBusy: loading, disabled: loading },
+				__( 'Run check', 'verdix-reviews' )
+			)
+		];
+
+		if ( failed ) {
+			children.push( el( Notice, { key: 'failed', status: 'error', isDismissible: false }, __( 'The check could not run.', 'verdix-reviews' ) ) );
+		}
+
+		if ( result ) {
+			if ( ! result.issues.length ) {
+				children.push( el( Notice, { key: 'ok', status: 'success', isDismissible: false }, __( 'No schema issues found.', 'verdix-reviews' ) ) );
+			}
+			result.issues.forEach( function( issue, i ) {
+				children.push(
+					el( Notice, {
+						key: 'issue-' + i,
+						status: issue.level === 'error' ? 'error' : issue.level === 'warning' ? 'warning' : 'info',
+						isDismissible: false
+					}, issue.message )
+				);
+			} );
+			if ( result.published ) {
+				children.push(
+					el( 'p', { key: 'rrt' },
+						el( 'a', { href: result.test_url, target: '_blank', rel: 'noopener noreferrer' }, __( 'Test in Google Rich Results Test', 'verdix-reviews' ) )
+					)
+				);
+			}
+		}
+
+		return el( 'div', { className: 'verdix-schema-check' }, children );
+	}
+
 	function Edit( props ) {
 		var blockProps = useBlockProps();
 		var context = props.context || {};
@@ -301,6 +377,11 @@
 				{ label: 'Thing', value: 'Thing' }
 			];
 
+		var typeNote = '';
+		schemaTypeOptions.forEach( function( t ) {
+			if ( t.value === review.schema_type && t.note ) { typeNote = t.note; }
+		} );
+
 		function updateTypeField( typeKey, fieldKey, value ) {
 			var tf = Object.assign( {}, review.type_fields || {} );
 			var typeObj = Object.assign( {}, tf[ typeKey ] || {} );
@@ -342,6 +423,7 @@
 					options: schemaTypeOptions,
 					onChange: function( val ) { updateReview( { schema_type: val } ); }
 				} ),
+				typeNote ? el( Notice, { status: 'warning', isDismissible: false }, typeNote ) : null,
 				typeFieldControls,
 				el( TextControl, {
 					label: __( 'Product / Item Name', 'verdix-reviews' ),
@@ -371,6 +453,12 @@
 					onChange: function( val ) { updateReview( { author_name: val } ); },
 					placeholder: __( 'Uses default from settings', 'verdix-reviews' )
 				} )
+			)
+		);
+
+		inspectorPanels.push(
+			el( PanelBody, { key: 'schema-check', title: __( 'Schema check', 'verdix-reviews' ), initialOpen: false },
+				el( SchemaCheck, {} )
 			)
 		);
 

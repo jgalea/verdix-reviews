@@ -48,6 +48,26 @@ function verdix_register_rest_routes() {
 			),
 		)
 	);
+
+	register_rest_route(
+		'verdix/v1',
+		'/review/(?P<id>\d+)/check',
+		array(
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => 'verdix_rest_check_review',
+			'permission_callback' => function ( $request ) {
+				return current_user_can( 'edit_post', $request->get_param( 'id' ) );
+			},
+			'args'                => array(
+				'id' => array(
+					'validate_callback' => function ( $param ) {
+						return is_numeric( $param );
+					},
+					'sanitize_callback' => 'absint',
+				),
+			),
+		)
+	);
 }
 add_action( 'rest_api_init', 'verdix_register_rest_routes' );
 
@@ -126,6 +146,28 @@ function verdix_rest_update_review( $request ) {
 			'post_id' => $post_id,
 			'review'  => $review,
 			'updated' => true,
+		),
+		200
+	);
+}
+
+function verdix_rest_check_review( $request ) {
+	$post_id = $request->get_param( 'id' );
+
+	if ( ! get_post( $post_id ) ) {
+		return new WP_Error(
+			'verdix_not_found',
+			__( 'Post not found.', 'verdix-reviews' ),
+			array( 'status' => 404 )
+		);
+	}
+
+	return new WP_REST_Response(
+		array(
+			'post_id'   => $post_id,
+			'issues'    => verdix_schema_check( $post_id ),
+			'published' => 'publish' === get_post_status( $post_id ),
+			'test_url'  => verdix_rich_results_test_url( $post_id ),
 		),
 		200
 	);
