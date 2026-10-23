@@ -3,6 +3,8 @@ defined( 'ABSPATH' ) || exit;
 
 // Menu registration is handled by admin/settings.php.
 
+require_once VERDIX_DIR . 'admin/migrations/sources.php';
+
 // =========================================================================
 // AJAX handlers
 // =========================================================================
@@ -19,12 +21,13 @@ function verdix_ajax_migrate() {
 
 	$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 	$source  = isset( $_POST['source'] ) ? sanitize_text_field( wp_unslash( $_POST['source'] ) ) : 'wp_review_pro';
+	$replace = ! empty( $_POST['replace'] );
 
 	if ( ! $post_id ) {
 		wp_send_json_error( array( 'message' => __( 'Invalid post ID.', 'verdix-reviews' ) ) );
 	}
 
-	$result = verdix_migrate_post( $post_id, $source );
+	$result = verdix_migrate_post( $post_id, $source, $replace );
 
 	if ( is_wp_error( $result ) ) {
 		wp_send_json_error( array( 'message' => $result->get_error_message() ) );
@@ -53,7 +56,8 @@ function verdix_ajax_migrate_all() {
 		wp_send_json_error( array( 'message' => __( 'Permission denied.', 'verdix-reviews' ) ) );
 	}
 
-	$source = isset( $_POST['source'] ) ? sanitize_text_field( wp_unslash( $_POST['source'] ) ) : 'wp_review_pro';
+	$source  = isset( $_POST['source'] ) ? sanitize_text_field( wp_unslash( $_POST['source'] ) ) : 'wp_review_pro';
+	$replace = ! empty( $_POST['replace'] );
 
 	$sources = verdix_get_migration_sources();
 	if ( ! isset( $sources[ $source ] ) ) {
@@ -65,7 +69,7 @@ function verdix_ajax_migrate_all() {
 	$errors   = array();
 
 	foreach ( $posts as $post ) {
-		$result = verdix_migrate_post( $post->ID, $source );
+		$result = verdix_migrate_post( $post->ID, $source, $replace );
 		if ( is_wp_error( $result ) ) {
 			$errors[] = sprintf( '%s: %s', get_the_title( $post->ID ), $result->get_error_message() );
 		} else {
@@ -96,14 +100,22 @@ add_action( 'wp_ajax_verdix_migrate_all', 'verdix_ajax_migrate_all' );
  *
  * @param int    $post_id Post ID.
  * @param string $source  Migration source key.
+ * @param bool   $replace Replace the source block or shortcode in the content with the Verdix block.
  * @return true|WP_Error True on success, WP_Error on failure.
  */
-function verdix_migrate_post( $post_id, $source = 'wp_review_pro' ) {
+function verdix_migrate_post( $post_id, $source = 'wp_review_pro', $replace = false ) {
 	$sources = verdix_get_migration_sources();
 	if ( ! isset( $sources[ $source ] ) || ! is_callable( $sources[ $source ]['migrate'] ) ) {
 		return new WP_Error( 'invalid_source', __( 'Unknown migration source.', 'verdix-reviews' ) );
 	}
-	return call_user_func( $sources[ $source ]['migrate'], $post_id );
+
+	$result = call_user_func( $sources[ $source ]['migrate'], $post_id );
+
+	if ( true === $result && $replace && ! empty( $sources[ $source ]['replace'] ) && is_callable( $sources[ $source ]['replace'] ) ) {
+		call_user_func( $sources[ $source ]['replace'], $post_id );
+	}
+
+	return $result;
 }
 
 /**
@@ -364,7 +376,7 @@ function verdix_get_migratable_posts() {
  * @param string $hook_suffix Current admin page.
  */
 function verdix_migration_enqueue( $hook_suffix ) {
-	if ( 'verdix_page_verdix-migration' !== $hook_suffix ) {
+	if ( 'verdix-reviews_page_verdix-migration' !== $hook_suffix ) {
 		return;
 	}
 
@@ -395,6 +407,7 @@ function verdix_migration_enqueue( $hook_suffix ) {
 				'error'      => __( 'Error', 'verdix-reviews' ),
 				'confirmAll' => __( 'Migrate all posts? This cannot be undone.', 'verdix-reviews' ),
 				'retry'      => __( 'Retry Migration', 'verdix-reviews' ),
+				'saved'      => __( 'Saved', 'verdix-reviews' ),
 			),
 		)
 	);

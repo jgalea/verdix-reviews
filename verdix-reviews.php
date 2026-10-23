@@ -28,6 +28,7 @@ require_once VERDIX_DIR . 'includes/rest-api.php';
 require_once VERDIX_DIR . 'includes/block.php';
 require_once VERDIX_DIR . 'includes/render.php';
 require_once VERDIX_DIR . 'includes/shortcode.php';
+require_once VERDIX_DIR . 'admin/migrations/schema-stop.php';
 
 if ( is_admin() ) {
 	require_once VERDIX_DIR . 'admin/settings.php';

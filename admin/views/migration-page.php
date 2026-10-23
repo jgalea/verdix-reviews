@@ -108,6 +108,28 @@ $total_migratable = array_sum( wp_list_pluck( $detected, 'total' ) );
 				</button>
 			</p>
 
+			<?php if ( ! empty( $source_config['replace'] ) ) : ?>
+				<p>
+					<label>
+						<input type="checkbox" class="verdix-migrate-replace" data-source="<?php echo esc_attr( $source_key ); ?>">
+						<?php echo esc_html( $source_config['replace_label'] ); ?>
+					</label>
+				</p>
+			<?php endif; ?>
+
+			<?php if ( ! empty( $source_config['plugin_active'] ) ) : ?>
+				<p>
+					<label>
+						<input type="checkbox" class="verdix-stop-schema" data-source="<?php echo esc_attr( $source_key ); ?>" <?php checked( verdix_schema_stop_enabled( $source_key ) ); ?>>
+						<?php
+						/* translators: %s: source plugin name */
+						echo esc_html( sprintf( __( 'Stop %s printing its review schema', 'verdix-reviews' ), $source_config['plugin_name'] ) );
+						?>
+					</label>
+					<span class="description"><?php esc_html_e( 'Applies to posts that have Verdix data, so the page does not output two review schemas.', 'verdix-reviews' ); ?></span>
+				</p>
+			<?php endif; ?>
+
 			<table class="wp-list-table widefat fixed striped">
 				<thead>
 					<tr>
