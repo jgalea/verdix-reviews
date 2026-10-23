@@ -238,6 +238,21 @@
 	text-overflow: ellipsis;
 }
 
+@media (max-width: 480px) {
+	.verdix-style-default .verdix-box__header {
+		flex-wrap: wrap;
+	}
+
+	.verdix-style-default .verdix-box__header-left {
+		flex: 1 1 100%;
+	}
+
+	.verdix-style-default .verdix-box__product-name {
+		white-space: normal;
+		overflow-wrap: anywhere;
+	}
+}
+
 /* Numeric score box */
 .verdix-style-default .verdix-box__score-box {
 	display: inline-flex;
