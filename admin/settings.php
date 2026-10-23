@@ -85,6 +85,14 @@ function verdix_register_settings() {
 	);
 
 	add_settings_field(
+		'schema_output',
+		__( 'Schema Output', 'verdix-reviews' ),
+		'verdix_field_schema_output',
+		'verdix-settings',
+		'verdix_general'
+	);
+
+	add_settings_field(
 		'default_position',
 		__( 'Default Review Position', 'verdix-reviews' ),
 		'verdix_field_position',
@@ -150,6 +158,11 @@ function verdix_sanitize_settings( $input ) {
 	$output['default_author_name'] = '';
 	if ( isset( $input['default_author_name'] ) ) {
 		$output['default_author_name'] = sanitize_text_field( $input['default_author_name'] );
+	}
+
+	$output['schema_output'] = 'auto';
+	if ( isset( $input['schema_output'] ) && isset( verdix_get_schema_output_modes()[ $input['schema_output'] ] ) ) {
+		$output['schema_output'] = $input['schema_output'];
 	}
 
 	$valid_positions = array( 'bottom', 'top', 'both', 'manual' );
@@ -230,6 +243,19 @@ function verdix_field_author_name() {
 		value="<?php echo esc_attr( $value ); ?>" class="regular-text"
 		placeholder="<?php esc_attr_e( 'e.g., John Smith', 'verdix-reviews' ); ?>">
 	<p class="description"><?php esc_html_e( 'Used in JSON-LD schema as review author. Falls back to post author if empty.', 'verdix-reviews' ); ?></p>
+	<?php
+}
+
+function verdix_field_schema_output() {
+	$options = get_option( 'verdix_settings', array() );
+	$current = isset( $options['schema_output'] ) ? $options['schema_output'] : 'auto';
+	?>
+	<select name="verdix_settings[schema_output]" id="verdix_schema_output">
+		<?php foreach ( verdix_get_schema_output_modes() as $value => $label ) : ?>
+			<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $current, $value ); ?>><?php echo esc_html( $label ); ?></option>
+		<?php endforeach; ?>
+	</select>
+	<p class="description"><?php esc_html_e( 'Yoast SEO, Rank Math and All in One SEO print their own schema graph. Auto adds the review to that graph instead of printing a second script, which avoids duplicate review markup.', 'verdix-reviews' ); ?></p>
 	<?php
 }
 
