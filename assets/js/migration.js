@@ -23,6 +23,37 @@
 		cell.appendChild( span );
 	}
 
+	function replaceFlag( source ) {
+		var box = document.querySelector( '.verdix-migrate-replace[data-source="' + source + '"]' );
+		return box && box.checked ? '1' : '';
+	}
+
+	document.querySelectorAll( '.verdix-stop-schema' ).forEach( function( box ) {
+		box.addEventListener( 'change', function() {
+			var data = new FormData();
+			data.append( 'action', 'verdix_migration_stop_schema' );
+			data.append( 'nonce', nonce );
+			data.append( 'source', box.getAttribute( 'data-source' ) );
+			data.append( 'enabled', box.checked ? '1' : '' );
+			box.disabled = true;
+			fetch( ajaxUrl, { method: 'POST', body: data } )
+				.then( function( r ) {
+					return r.json();
+				} )
+				.then( function( resp ) {
+					if ( ! resp.success ) {
+						box.checked = ! box.checked;
+					}
+				} )
+				.catch( function() {
+					box.checked = ! box.checked;
+				} )
+				.then( function() {
+					box.disabled = false;
+				} );
+		} );
+	} );
+
 	// Single post migration.
 	document.querySelectorAll( '.verdix-migrate-single' ).forEach( function( btn ) {
 		btn.addEventListener( 'click', function() {
@@ -39,6 +70,7 @@
 			data.append( 'nonce', nonce );
 			data.append( 'post_id', postId );
 			data.append( 'source', source );
+			data.append( 'replace', replaceFlag( source ) );
 
 			fetch( ajaxUrl, { method: 'POST', body: data } )
 				.then( function( r ) {
@@ -76,6 +108,7 @@
 			data.append( 'action', 'verdix_migrate_all' );
 			data.append( 'nonce', nonce );
 			data.append( 'source', source );
+			data.append( 'replace', replaceFlag( source ) );
 
 			var currentBtn = this;
 
