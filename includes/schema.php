@@ -98,7 +98,7 @@ function verdix_get_type_fields() {
  * Output JSON-LD schema on singular posts/pages that have review data.
  */
 function verdix_output_schema() {
-	if ( ! is_singular() ) {
+	if ( ! is_singular() || 'standalone' !== verdix_get_schema_mode() ) {
 		return;
 	}
 

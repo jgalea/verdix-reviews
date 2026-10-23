@@ -93,6 +93,14 @@ function verdix_register_settings() {
 	);
 
 	add_settings_field(
+		'schema_output',
+		__( 'Schema Output', 'verdix-reviews' ),
+		'verdix_field_schema_output',
+		'verdix-settings',
+		'verdix_general'
+	);
+
+	add_settings_field(
 		'default_position',
 		__( 'Default Review Position', 'verdix-reviews' ),
 		'verdix_field_position',
@@ -168,6 +176,11 @@ function verdix_sanitize_settings( $input ) {
 	$output['default_disclosure_text'] = '';
 	if ( isset( $input['default_disclosure_text'] ) ) {
 		$output['default_disclosure_text'] = sanitize_textarea_field( $input['default_disclosure_text'] );
+	}
+
+	$output['schema_output'] = 'auto';
+	if ( isset( $input['schema_output'] ) && isset( verdix_get_schema_output_modes()[ $input['schema_output'] ] ) ) {
+		$output['schema_output'] = $input['schema_output'];
 	}
 
 	$valid_positions = array( 'bottom', 'top', 'both', 'manual' );
@@ -266,6 +279,19 @@ function verdix_field_disclosure() {
 			placeholder="<?php esc_attr_e( 'Text for the Custom option', 'verdix-reviews' ); ?>"><?php echo esc_textarea( $text ); ?></textarea>
 	</p>
 	<p class="description"><?php esc_html_e( 'Shown in every review box that does not set its own disclosure. Google requires disclosing incentivized reviews.', 'verdix-reviews' ); ?></p>
+	<?php
+}
+
+function verdix_field_schema_output() {
+	$options = get_option( 'verdix_settings', array() );
+	$current = isset( $options['schema_output'] ) ? $options['schema_output'] : 'auto';
+	?>
+	<select name="verdix_settings[schema_output]" id="verdix_schema_output">
+		<?php foreach ( verdix_get_schema_output_modes() as $value => $label ) : ?>
+			<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $current, $value ); ?>><?php echo esc_html( $label ); ?></option>
+		<?php endforeach; ?>
+	</select>
+	<p class="description"><?php esc_html_e( 'Yoast SEO, Rank Math and All in One SEO print their own schema graph. Auto adds the review to that graph instead of printing a second script, which avoids duplicate review markup.', 'verdix-reviews' ); ?></p>
 	<?php
 }
 
