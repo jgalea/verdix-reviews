@@ -244,6 +244,22 @@ function verdix_save_review( $post_id, $data ) {
 }
 
 /**
+ * Merge partial review fields into the saved review and save through the sanitizer.
+ *
+ * @param int   $post_id Post ID.
+ * @param array $partial Review fields to change.
+ * @return array Saved review data.
+ */
+function verdix_update_review( $post_id, $partial ) {
+	$existing = verdix_get_review( $post_id );
+	$merged   = is_array( $existing ) ? array_replace( $existing, $partial ) : $partial;
+
+	verdix_save_review( $post_id, $merged );
+
+	return verdix_get_review( $post_id );
+}
+
+/**
  * Get default review values from settings.
  *
  * @return array Default values.

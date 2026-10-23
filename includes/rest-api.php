@@ -140,8 +140,7 @@ function verdix_rest_update_review( $request ) {
 		);
 	}
 
-	verdix_save_review( $post_id, $body );
-	$review = verdix_get_review( $post_id );
+	$review = verdix_update_review( $post_id, $body );
 
 	return new WP_REST_Response(
 		array(

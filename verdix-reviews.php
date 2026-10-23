@@ -28,6 +28,7 @@ require_once VERDIX_DIR . 'includes/schema.php';
 require_once VERDIX_DIR . 'includes/schema-check.php';
 require_once VERDIX_DIR . 'includes/integrations/seo-plugins.php';
 require_once VERDIX_DIR . 'includes/rest-api.php';
+require_once VERDIX_DIR . 'includes/abilities.php';
 require_once VERDIX_DIR . 'includes/block.php';
 require_once VERDIX_DIR . 'includes/render.php';
 require_once VERDIX_DIR . 'includes/shortcode.php';
