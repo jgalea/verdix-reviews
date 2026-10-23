@@ -566,8 +566,8 @@ function verdix_admin_enqueue( $hook_suffix ) {
 	// Admin CSS on all Verdix Reviews pages.
 	$verdix_pages = array(
 		'toplevel_page_verdix-reviews',
-		'verdix_page_verdix-settings',
-		'verdix_page_verdix-migration',
+		'verdix-reviews_page_verdix-settings',
+		'verdix-reviews_page_verdix-migration',
 	);
 
 	if ( in_array( $hook_suffix, $verdix_pages, true ) ) {
@@ -580,7 +580,7 @@ function verdix_admin_enqueue( $hook_suffix ) {
 	}
 
 	// Color picker + frontend preview styles on settings page.
-	if ( 'verdix_page_verdix-settings' === $hook_suffix ) {
+	if ( 'verdix-reviews_page_verdix-settings' === $hook_suffix ) {
 		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_style(
 			'verdix-frontend',
