@@ -6,6 +6,10 @@ if ( ! function_exists( 'wp_register_ability' ) ) {
 }
 
 function verdix_register_ability_category() {
+	if ( ! function_exists( 'wp_register_ability_category' ) ) {
+		return;
+	}
+
 	wp_register_ability_category(
 		'verdix',
 		array(
