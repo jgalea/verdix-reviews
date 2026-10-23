@@ -118,3 +118,12 @@
 }
 
 .verdix-schema-check .components-notice { margin: 8px 0 0; }
+
+.verdix-offer-editor {
+	margin-bottom: 16px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #ddd;
+}
+.verdix-offer-editor .components-combobox-control {
+	margin-bottom: 16px;
+}

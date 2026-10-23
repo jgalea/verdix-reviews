@@ -133,6 +133,60 @@
 	outline-offset: 2px;
 }
 
+/* --- Offers --- */
+
+.verdix-box__offers {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 15px 20px;
+}
+
+.verdix-box__offer {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 16px;
+}
+
+.verdix-box__offer-merchant {
+	flex: 1 1 120px;
+	font-weight: 600;
+}
+
+.verdix-box__offer-price {
+	font-weight: 700;
+	color: var(--sb-accent);
+}
+
+.verdix-box__offer .verdix-box__cta-button {
+	min-width: 140px;
+	padding: 8px 24px;
+	text-align: center;
+}
+
+@media (max-width: 480px) {
+	.verdix-box__offer .verdix-box__cta-button {
+		flex: 1 1 100%;
+	}
+}
+
+/* --- Last tested and disclosure --- */
+
+.verdix-box__notes {
+	padding: 10px 20px 14px;
+	border-top: 1px solid var(--sb-border);
+	font-size: 0.85em;
+	opacity: 0.8;
+}
+
+.verdix-box__notes p {
+	margin: 0;
+}
+
+.verdix-box__notes p + p {
+	margin-top: 4px;
+}
 
 /* ==========================================================================
    1. DEFAULT STYLE — WP Review Pro-like layout
@@ -355,7 +409,8 @@
 
 /* --- CTA --- */
 
-.verdix-style-default .verdix-box__cta {
+.verdix-style-default .verdix-box__cta,
+.verdix-style-default .verdix-box__offers {
 	border-top: 1px solid var(--sb-border);
 }
 

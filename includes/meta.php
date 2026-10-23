@@ -181,6 +181,20 @@ function verdix_sanitize_data( $data ) {
 		$clean['cta_url'] = esc_url_raw( $data['cta_url'] );
 	}
 
+	$clean['offers'] = verdix_sanitize_offers( isset( $data['offers'] ) ? $data['offers'] : array() );
+
+	$clean['disclosure'] = '';
+	if ( isset( $data['disclosure'] ) && isset( verdix_get_disclosure_types()[ $data['disclosure'] ] ) ) {
+		$clean['disclosure'] = $data['disclosure'];
+	}
+
+	$clean['disclosure_text'] = '';
+	if ( isset( $data['disclosure_text'] ) ) {
+		$clean['disclosure_text'] = sanitize_textarea_field( $data['disclosure_text'] );
+	}
+
+	$clean['last_tested'] = verdix_sanitize_last_tested( isset( $data['last_tested'] ) ? $data['last_tested'] : '' );
+
 	$clean['author_name'] = '';
 	if ( isset( $data['author_name'] ) ) {
 		$clean['author_name'] = sanitize_text_field( $data['author_name'] );
@@ -252,6 +266,10 @@ function verdix_get_defaults() {
 		'currency'     => 'USD',
 		'cta_text'     => '',
 		'cta_url'      => '',
+		'offers'          => array(),
+		'disclosure'      => '',
+		'disclosure_text' => '',
+		'last_tested'     => '',
 		'author_name'  => isset( $options['default_author_name'] ) ? $options['default_author_name'] : '',
 	);
 }

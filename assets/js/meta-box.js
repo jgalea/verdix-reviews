@@ -73,6 +73,25 @@
 				}
 			}
 
+			if ( target.classList.contains( 'verdix-offers__add' ) ) {
+				e.preventDefault();
+				var offers = box.querySelector( '.verdix-offers' );
+				var template = document.getElementById( 'verdix-offer-template' );
+				if ( offers && template ) {
+					var index = parseInt( offers.getAttribute( 'data-next' ), 10 ) || 0;
+					offers.setAttribute( 'data-next', index + 1 );
+					var holder = document.createElement( 'div' );
+					holder.innerHTML = template.innerHTML.replace( /__INDEX__/g, index );
+					offers.appendChild( holder.firstElementChild );
+				}
+			}
+
+			if ( target.classList.contains( 'verdix-offer__remove' ) ) {
+				e.preventDefault();
+				var offerRow = target.closest( '.verdix-offer' );
+				if ( offerRow ) { offerRow.remove(); }
+			}
+
 			if ( target.classList.contains( 'verdix-repeater__remove' ) ) {
 				e.preventDefault();
 				var row = target.closest( '.verdix-repeater__row' );

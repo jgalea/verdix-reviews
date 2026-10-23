@@ -133,7 +133,18 @@ function verdix_get_editor_config() {
 		$type_fields_config[ $type_key ] = $list;
 	}
 
+	$disclosure_config = array();
+	foreach ( verdix_get_disclosure_types() as $slug => $label ) {
+		$disclosure_config[] = array(
+			'value' => $slug,
+			'label' => $label,
+		);
+	}
+
 	$config = array(
+		'disclosureTypes' => $disclosure_config,
+		'disclosurePresets' => verdix_get_disclosure_presets(),
+		'katinaActive'    => verdix_katina_active(),
 		'ratingTypes' => $rating_types_config,
 		'styles'      => $styles_config,
 		'schemaTypes' => $schema_types_config,

@@ -90,11 +90,49 @@ function verdix_render_box( $review, $post_id = 0 ) {
 			</div>
 		<?php endif; ?>
 
-		<?php if ( ! empty( $review['cta_url'] ) && ! empty( $review['cta_text'] ) ) : ?>
+		<?php if ( ! empty( $review['offers'] ) ) : ?>
+			<div class="verdix-box__offers">
+				<?php foreach ( verdix_get_offers( $review ) as $offer ) : ?>
+					<?php
+					if ( empty( $offer['href'] ) ) {
+						continue;
+					}
+					$offer_text = ! empty( $offer['cta_text'] ) ? $offer['cta_text'] : __( 'Check price', 'verdix-reviews' );
+					?>
+					<div class="verdix-box__offer">
+						<span class="verdix-box__offer-merchant"><?php echo esc_html( $offer['merchant'] ); ?></span>
+						<?php if ( '' !== (string) $offer['price'] ) : ?>
+							<span class="verdix-box__offer-price"><?php echo esc_html( verdix_format_price( $offer['price'], $offer['currency'] ) ); ?></span>
+						<?php endif; ?>
+						<a href="<?php echo esc_url( $offer['href'] ); ?>" class="verdix-box__cta-button" target="_blank" rel="<?php echo esc_attr( verdix_offer_rel( $offer, $review ) ); ?>"><?php echo esc_html( $offer_text ); ?></a>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		<?php elseif ( ! empty( $review['cta_url'] ) && ! empty( $review['cta_text'] ) ) : ?>
 			<div class="verdix-box__cta">
-				<a href="<?php echo esc_url( $review['cta_url'] ); ?>" class="verdix-box__cta-button" target="_blank" rel="noopener noreferrer nofollow">
+				<a href="<?php echo esc_url( $review['cta_url'] ); ?>" class="verdix-box__cta-button" target="_blank" rel="<?php echo esc_attr( verdix_offer_rel( array(), $review ) ); ?>">
 					<?php echo esc_html( $review['cta_text'] ); ?>
 				</a>
+			</div>
+		<?php endif; ?>
+
+		<?php
+		$disclosure_text = verdix_get_disclosure_text( $review );
+		$last_tested     = ! empty( $review['last_tested'] ) ? strtotime( $review['last_tested'] ) : false;
+		?>
+		<?php if ( $disclosure_text || $last_tested ) : ?>
+			<div class="verdix-box__notes">
+				<?php if ( $last_tested ) : ?>
+					<p class="verdix-box__tested">
+						<?php
+						/* translators: %s: date the product was last tested */
+						printf( esc_html__( 'Last tested: %s', 'verdix-reviews' ), esc_html( date_i18n( get_option( 'date_format' ), $last_tested ) ) );
+						?>
+					</p>
+				<?php endif; ?>
+				<?php if ( $disclosure_text ) : ?>
+					<p class="verdix-box__disclosure"><?php echo esc_html( $disclosure_text ); ?></p>
+				<?php endif; ?>
 			</div>
 		<?php endif; ?>
 	</div>

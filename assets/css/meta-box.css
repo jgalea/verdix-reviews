@@ -82,3 +82,35 @@
 .verdix-schema-check__item { margin: 0 0 4px; padding: 6px 10px; border-left: 4px solid #72aee6; background: #f6f7f7; }
 .verdix-schema-check__item--error { border-left-color: #d63638; }
 .verdix-schema-check__item--warning { border-left-color: #dba617; }
+
+/* --- Offers --- */
+
+.verdix-meta-box .verdix-offers {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-bottom: 8px;
+	max-width: 720px;
+}
+
+.verdix-meta-box .verdix-offer {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	padding: 8px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+}
+
+.verdix-meta-box .verdix-offer__price {
+	width: 90px;
+}
+
+.verdix-meta-box .verdix-offer__url {
+	flex: 1 1 240px;
+}
+
+.verdix-meta-box .verdix-offer__remove {
+	color: #b32d2e;
+}

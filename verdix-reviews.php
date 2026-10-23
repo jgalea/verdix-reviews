@@ -21,6 +21,7 @@ define( 'VERDIX_DIR', plugin_dir_path( __FILE__ ) );
 define( 'VERDIX_URL', plugin_dir_url( __FILE__ ) );
 define( 'VERDIX_BASENAME', plugin_basename( __FILE__ ) );
 
+require_once VERDIX_DIR . 'includes/offers.php';
 require_once VERDIX_DIR . 'includes/meta.php';
 require_once VERDIX_DIR . 'includes/hooks.php';
 require_once VERDIX_DIR . 'includes/schema.php';
