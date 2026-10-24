@@ -38,7 +38,7 @@ Your own score is marked up as a Review. Verdix doesn't present an editor's scor
 
 = Verdix Pro =
 
-[Verdix Pro](https://jeangalea.com/plugins/verdix/) adds ratings across several criteria, percentage and points scales, extra box styles, visitor ratings that feed a real aggregate rating, comparison tables, AI-drafted pros and cons, and migration from WP Product Review.
+[Verdix Reviews Pro](https://github.com/jgalea/verdix-reviews-pro) is free on GitHub during early access. It adds ratings across several criteria, percentage and points scales, extra box styles, visitor ratings that feed a real aggregate rating, comparison tables, AI-drafted pros and cons, and migration from WP Product Review.
 
 == Installation ==
 
@@ -75,7 +75,7 @@ In `<head>` on singular views with review data, or inside your SEO plugin's sche
 
 = Why don't I see an aggregateRating in the schema? =
 
-An aggregate rating has to come from your visitors, so Verdix only outputs one when visitor ratings exist (Verdix Pro). Your own score is output as a Review.
+An aggregate rating has to come from your visitors, so Verdix only outputs one when visitor ratings exist. Visitor ratings come with Verdix Reviews Pro. Your own score is output as a Review.
 
 = Does it work with Yoast SEO, Rank Math or All in One SEO? =
 
