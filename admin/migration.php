@@ -406,7 +406,7 @@ function verdix_migration_enqueue( $hook_suffix ) {
 				'migrated'   => __( 'Migrated', 'verdix-reviews' ),
 				'error'      => __( 'Error', 'verdix-reviews' ),
 				'confirmAll' => __( 'Migrate all posts? This cannot be undone.', 'verdix-reviews' ),
-				'retry'      => __( 'Retry Migration', 'verdix-reviews' ),
+				'retry'      => __( 'Retry migration', 'verdix-reviews' ),
 				'saved'      => __( 'Saved', 'verdix-reviews' ),
 			),
 		)

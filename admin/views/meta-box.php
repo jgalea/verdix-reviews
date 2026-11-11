@@ -45,7 +45,7 @@ if ( empty( $cons ) ) {
 
 		<tr>
 			<th scope="row">
-				<label for="verdix_review_rating_type"><?php esc_html_e( 'Rating Type', 'verdix-reviews' ); ?></label>
+				<label for="verdix_review_rating_type"><?php esc_html_e( 'Rating type', 'verdix-reviews' ); ?></label>
 			</th>
 			<td>
 				<?php $rating_types = verdix_get_rating_types(); ?>
@@ -121,7 +121,7 @@ if ( empty( $cons ) ) {
 						</div>
 					<?php endforeach; ?>
 				</div>
-				<button type="button" class="button verdix-repeater__add" data-target="pros"><?php esc_html_e( '+ Add Pro', 'verdix-reviews' ); ?></button>
+				<button type="button" class="button verdix-repeater__add" data-target="pros"><?php esc_html_e( '+ Add pro', 'verdix-reviews' ); ?></button>
 			</td>
 		</tr>
 
@@ -136,24 +136,24 @@ if ( empty( $cons ) ) {
 						</div>
 					<?php endforeach; ?>
 				</div>
-				<button type="button" class="button verdix-repeater__add" data-target="cons"><?php esc_html_e( '+ Add Con', 'verdix-reviews' ); ?></button>
+				<button type="button" class="button verdix-repeater__add" data-target="cons"><?php esc_html_e( '+ Add con', 'verdix-reviews' ); ?></button>
 			</td>
 		</tr>
 
 		<tr>
 			<th scope="row">
-				<label for="verdix_review_cta_text"><?php esc_html_e( 'CTA Button Text', 'verdix-reviews' ); ?></label>
+				<label for="verdix_review_cta_text"><?php esc_html_e( 'CTA button text', 'verdix-reviews' ); ?></label>
 			</th>
 			<td>
 				<input type="text" id="verdix_review_cta_text" name="verdix_review_cta_text"
 					value="<?php echo esc_attr( $data['cta_text'] ); ?>" class="regular-text"
-					placeholder="<?php esc_attr_e( 'e.g., Visit Website', 'verdix-reviews' ); ?>">
+					placeholder="<?php esc_attr_e( 'e.g., Visit website', 'verdix-reviews' ); ?>">
 			</td>
 		</tr>
 
 		<tr>
 			<th scope="row">
-				<label for="verdix_review_cta_url"><?php esc_html_e( 'CTA Button URL', 'verdix-reviews' ); ?></label>
+				<label for="verdix_review_cta_url"><?php esc_html_e( 'CTA button URL', 'verdix-reviews' ); ?></label>
 			</th>
 			<td>
 				<input type="url" id="verdix_review_cta_url" name="verdix_review_cta_url"
@@ -195,7 +195,7 @@ if ( empty( $cons ) ) {
 				<template id="verdix-offer-template">
 					<?php verdix_meta_box_offer_row( '__INDEX__', $offer_blank, $katina_links ); ?>
 				</template>
-				<button type="button" class="button verdix-offers__add"><?php esc_html_e( '+ Add Offer', 'verdix-reviews' ); ?></button>
+				<button type="button" class="button verdix-offers__add"><?php esc_html_e( '+ Add offer', 'verdix-reviews' ); ?></button>
 				<p class="description"><?php esc_html_e( 'Several offers are listed as separate buttons. With none, the price and CTA fields are used.', 'verdix-reviews' ); ?></p>
 			</td>
 		</tr>
@@ -220,7 +220,7 @@ if ( empty( $cons ) ) {
 
 		<tr>
 			<th scope="row">
-				<label for="verdix_review_last_tested"><?php esc_html_e( 'Last Tested', 'verdix-reviews' ); ?></label>
+				<label for="verdix_review_last_tested"><?php esc_html_e( 'Last tested', 'verdix-reviews' ); ?></label>
 			</th>
 			<td>
 				<input type="date" id="verdix_review_last_tested" name="verdix_review_last_tested" value="<?php echo esc_attr( $data['last_tested'] ); ?>">
@@ -229,11 +229,11 @@ if ( empty( $cons ) ) {
 	</table>
 
 	<hr>
-	<h4><?php esc_html_e( 'Schema Settings', 'verdix-reviews' ); ?></h4>
+	<h4><?php esc_html_e( 'Schema settings', 'verdix-reviews' ); ?></h4>
 	<table class="form-table">
 		<tr>
 			<th scope="row">
-				<label for="verdix_review_schema_type"><?php esc_html_e( 'Schema Type', 'verdix-reviews' ); ?></label>
+				<label for="verdix_review_schema_type"><?php esc_html_e( 'Schema type', 'verdix-reviews' ); ?></label>
 			</th>
 			<td>
 				<select id="verdix_review_schema_type" name="verdix_review_schema_type">
@@ -253,7 +253,7 @@ if ( empty( $cons ) ) {
 		if ( ! empty( $type_registry ) ) :
 		?>
 		<tr id="verdix-type-fields-row">
-			<th scope="row"><?php esc_html_e( 'Type-specific Fields', 'verdix-reviews' ); ?></th>
+			<th scope="row"><?php esc_html_e( 'Type-specific fields', 'verdix-reviews' ); ?></th>
 			<td>
 				<?php foreach ( $type_registry as $type_key => $type_fields ) : ?>
 					<div class="verdix-type-fields" data-type="<?php echo esc_attr( $type_key ); ?>"
@@ -299,7 +299,7 @@ if ( empty( $cons ) ) {
 
 		<tr>
 			<th scope="row">
-				<label for="verdix_review_product_name"><?php esc_html_e( 'Product / Item Name', 'verdix-reviews' ); ?></label>
+				<label for="verdix_review_product_name"><?php esc_html_e( 'Product / item name', 'verdix-reviews' ); ?></label>
 			</th>
 			<td>
 				<input type="text" id="verdix_review_product_name" name="verdix_review_product_name"
@@ -327,7 +327,7 @@ if ( empty( $cons ) ) {
 
 		<tr>
 			<th scope="row">
-				<label for="verdix_review_author_name"><?php esc_html_e( 'Author Name Override', 'verdix-reviews' ); ?></label>
+				<label for="verdix_review_author_name"><?php esc_html_e( 'Author name override', 'verdix-reviews' ); ?></label>
 			</th>
 			<td>
 				<input type="text" id="verdix_review_author_name" name="verdix_review_author_name"

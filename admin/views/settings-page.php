@@ -33,8 +33,9 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
 				<?php
 				settings_fields( 'verdix_settings_group' );
 				?>
+				<input type="hidden" name="verdix_settings[_tab]" value="general">
 				<div class="verdix-panel">
-					<h2 class="verdix-panel__title"><?php esc_html_e( 'Review Defaults', 'verdix-reviews' ); ?></h2>
+					<h2 class="verdix-panel__title"><?php esc_html_e( 'Review defaults', 'verdix-reviews' ); ?></h2>
 					<table class="form-table" role="presentation">
 						<?php do_settings_fields( 'verdix-settings', 'verdix_general' ); ?>
 					<?php do_action( 'verdix_settings_after_general' ); ?>
@@ -42,14 +43,13 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
 				</div>
 
 				<div class="verdix-panel">
-					<h2 class="verdix-panel__title"><?php esc_html_e( 'Post Types', 'verdix-reviews' ); ?></h2>
+					<h2 class="verdix-panel__title"><?php esc_html_e( 'Post types', 'verdix-reviews' ); ?></h2>
 					<table class="form-table" role="presentation">
 						<tr>
-							<th scope="row"><?php esc_html_e( 'Enable Reviews On', 'verdix-reviews' ); ?></th>
+							<th scope="row"><?php esc_html_e( 'Enable reviews on', 'verdix-reviews' ); ?></th>
 							<td>
 								<?php
-								$options       = get_option( 'verdix_settings', array() );
-								$enabled_types = isset( $options['post_types'] ) ? $options['post_types'] : array( 'post', 'page' );
+								$enabled_types = verdix_get_post_types();
 								$available     = get_post_types( array( 'public' => true ), 'objects' );
 								foreach ( $available as $pt ) :
 									if ( 'attachment' === $pt->name ) {
@@ -76,9 +76,10 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
 
 			<form method="post" action="options.php">
 				<?php settings_fields( 'verdix_settings_group' ); ?>
+				<input type="hidden" name="verdix_settings[_tab]" value="appearance">
 
 				<div class="verdix-panel">
-					<h2 class="verdix-panel__title"><?php esc_html_e( 'Style & Colors', 'verdix-reviews' ); ?></h2>
+					<h2 class="verdix-panel__title"><?php esc_html_e( 'Style and colors', 'verdix-reviews' ); ?></h2>
 					<table class="form-table" role="presentation">
 						<?php do_settings_fields( 'verdix-settings-appearance', 'verdix_appearance' ); ?>
 					</table>

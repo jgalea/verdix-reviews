@@ -96,7 +96,7 @@ if ( ! empty( $recent_ids ) ) {
 				<div class="verdix-stat-card__icon dashicons dashicons-edit"></div>
 				<div class="verdix-stat-card__content">
 					<span class="verdix-stat-card__value"><?php echo esc_html( $total_reviews ); ?></span>
-					<span class="verdix-stat-card__label"><?php esc_html_e( 'Total Reviews', 'verdix-reviews' ); ?></span>
+					<span class="verdix-stat-card__label"><?php esc_html_e( 'Total reviews', 'verdix-reviews' ); ?></span>
 				</div>
 			</div>
 
@@ -104,7 +104,7 @@ if ( ! empty( $recent_ids ) ) {
 				<div class="verdix-stat-card__icon dashicons dashicons-star-filled"></div>
 				<div class="verdix-stat-card__content">
 					<span class="verdix-stat-card__value"><?php echo esc_html( $avg_rating ); ?><small>/5</small></span>
-					<span class="verdix-stat-card__label"><?php esc_html_e( 'Average Rating', 'verdix-reviews' ); ?></span>
+					<span class="verdix-stat-card__label"><?php esc_html_e( 'Average rating', 'verdix-reviews' ); ?></span>
 				</div>
 			</div>
 
@@ -115,10 +115,10 @@ if ( ! empty( $recent_ids ) ) {
 					<span class="verdix-stat-card__label">
 						<?php if ( $wp_review_count > 0 ) : ?>
 							<a href="<?php echo esc_url( admin_url( 'admin.php?page=verdix-migration' ) ); ?>">
-								<?php esc_html_e( 'Ready to Migrate', 'verdix-reviews' ); ?>
+								<?php esc_html_e( 'Ready to migrate', 'verdix-reviews' ); ?>
 							</a>
 						<?php else : ?>
-							<?php esc_html_e( 'Ready to Migrate', 'verdix-reviews' ); ?>
+							<?php esc_html_e( 'Ready to migrate', 'verdix-reviews' ); ?>
 						<?php endif; ?>
 					</span>
 				</div>
@@ -128,7 +128,7 @@ if ( ! empty( $recent_ids ) ) {
 				<div class="verdix-stat-card__icon dashicons dashicons-clock"></div>
 				<div class="verdix-stat-card__content">
 					<span class="verdix-stat-card__value"><?php echo esc_html( $latest_review_label ); ?></span>
-					<span class="verdix-stat-card__label"><?php esc_html_e( 'Latest Review', 'verdix-reviews' ); ?></span>
+					<span class="verdix-stat-card__label"><?php esc_html_e( 'Latest review', 'verdix-reviews' ); ?></span>
 				</div>
 			</div>
 		</div>
@@ -138,7 +138,7 @@ if ( ! empty( $recent_ids ) ) {
 			<!-- Recent reviews -->
 			<div class="verdix-panel">
 				<h2 class="verdix-panel__title">
-					<?php esc_html_e( 'Recent Reviews', 'verdix-reviews' ); ?>
+					<?php esc_html_e( 'Recent reviews', 'verdix-reviews' ); ?>
 					<?php if ( $total_reviews > 10 ) : ?>
 						<span class="verdix-panel__title-meta">
 							<?php
@@ -201,7 +201,7 @@ if ( ! empty( $recent_ids ) ) {
 
 			<!-- Quick links panel -->
 			<div class="verdix-panel">
-				<h2 class="verdix-panel__title"><?php esc_html_e( 'Quick Links', 'verdix-reviews' ); ?></h2>
+				<h2 class="verdix-panel__title"><?php esc_html_e( 'Quick links', 'verdix-reviews' ); ?></h2>
 				<div class="verdix-quick-links">
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=verdix-settings' ) ); ?>" class="verdix-quick-link">
 						<span class="dashicons dashicons-admin-generic"></span>
@@ -209,21 +209,21 @@ if ( ! empty( $recent_ids ) ) {
 					</a>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=verdix-migration' ) ); ?>" class="verdix-quick-link">
 						<span class="dashicons dashicons-migrate"></span>
-						<?php esc_html_e( 'Migration Tools', 'verdix-reviews' ); ?>
+						<?php esc_html_e( 'Migration tools', 'verdix-reviews' ); ?>
 						<?php if ( $wp_review_count > 0 ) : ?>
 							<span class="verdix-badge verdix-badge--count"><?php echo esc_html( $wp_review_count ); ?></span>
 						<?php endif; ?>
 					</a>
 					<a href="<?php echo esc_url( admin_url( 'post-new.php' ) ); ?>" class="verdix-quick-link">
 						<span class="dashicons dashicons-plus-alt2"></span>
-						<?php esc_html_e( 'New Review Post', 'verdix-reviews' ); ?>
+						<?php esc_html_e( 'New review post', 'verdix-reviews' ); ?>
 					</a>
 				</div>
 
 				<h3 class="verdix-panel__subtitle"><?php esc_html_e( 'Usage', 'verdix-reviews' ); ?></h3>
 				<div class="verdix-usage-hints">
 					<div class="verdix-hint">
-						<strong><?php esc_html_e( 'Block Editor', 'verdix-reviews' ); ?></strong>
+						<strong><?php esc_html_e( 'Block editor', 'verdix-reviews' ); ?></strong>
 						<p><?php esc_html_e( 'Add the "Review Box" block to any post or page.', 'verdix-reviews' ); ?></p>
 					</div>
 					<div class="verdix-hint">

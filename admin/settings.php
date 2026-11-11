@@ -70,7 +70,7 @@ function verdix_register_settings() {
 
 	add_settings_field(
 		'default_schema_type',
-		__( 'Default Schema Type', 'verdix-reviews' ),
+		__( 'Default schema type', 'verdix-reviews' ),
 		'verdix_field_schema_type',
 		'verdix-settings',
 		'verdix_general'
@@ -78,7 +78,7 @@ function verdix_register_settings() {
 
 	add_settings_field(
 		'default_author_name',
-		__( 'Default Author Name', 'verdix-reviews' ),
+		__( 'Default author name', 'verdix-reviews' ),
 		'verdix_field_author_name',
 		'verdix-settings',
 		'verdix_general'
@@ -86,7 +86,7 @@ function verdix_register_settings() {
 
 	add_settings_field(
 		'default_disclosure',
-		__( 'Default Disclosure', 'verdix-reviews' ),
+		__( 'Default disclosure', 'verdix-reviews' ),
 		'verdix_field_disclosure',
 		'verdix-settings',
 		'verdix_general'
@@ -94,7 +94,7 @@ function verdix_register_settings() {
 
 	add_settings_field(
 		'schema_output',
-		__( 'Schema Output', 'verdix-reviews' ),
+		__( 'Schema output', 'verdix-reviews' ),
 		'verdix_field_schema_output',
 		'verdix-settings',
 		'verdix_general'
@@ -102,7 +102,7 @@ function verdix_register_settings() {
 
 	add_settings_field(
 		'default_position',
-		__( 'Default Review Position', 'verdix-reviews' ),
+		__( 'Default review position', 'verdix-reviews' ),
 		'verdix_field_position',
 		'verdix-settings',
 		'verdix_general'
@@ -118,7 +118,7 @@ function verdix_register_settings() {
 
 	add_settings_field(
 		'default_style',
-		__( 'Review Box Style', 'verdix-reviews' ),
+		__( 'Review box style', 'verdix-reviews' ),
 		'verdix_field_default_style',
 		'verdix-settings-appearance',
 		'verdix_appearance'
@@ -126,7 +126,7 @@ function verdix_register_settings() {
 
 	add_settings_field(
 		'accent_color',
-		__( 'Star / Accent Color', 'verdix-reviews' ),
+		__( 'Star / accent color', 'verdix-reviews' ),
 		'verdix_field_accent_color',
 		'verdix-settings-appearance',
 		'verdix_appearance'
@@ -134,7 +134,7 @@ function verdix_register_settings() {
 
 	add_settings_field(
 		'bg_color',
-		__( 'Background Color', 'verdix-reviews' ),
+		__( 'Background color', 'verdix-reviews' ),
 		'verdix_field_bg_color',
 		'verdix-settings-appearance',
 		'verdix_appearance'
@@ -142,7 +142,7 @@ function verdix_register_settings() {
 
 	add_settings_field(
 		'border_color',
-		__( 'Border Color', 'verdix-reviews' ),
+		__( 'Border color', 'verdix-reviews' ),
 		'verdix_field_border_color',
 		'verdix-settings-appearance',
 		'verdix_appearance'
@@ -155,67 +155,58 @@ add_action( 'admin_init', 'verdix_register_settings' );
 // =========================================================================
 
 function verdix_sanitize_settings( $input ) {
-	$output = array();
+	$input  = is_array( $input ) ? $input : array();
+	$stored = get_option( 'verdix_settings', array() );
+	$output = is_array( $stored ) ? $stored : array();
+	$tab    = isset( $input['_tab'] ) ? sanitize_key( $input['_tab'] ) : '';
 
-	$valid_types = array_keys( verdix_get_schema_types() );
-	$output['default_schema_type'] = 'Product';
-	if ( isset( $input['default_schema_type'] ) && in_array( $input['default_schema_type'], $valid_types, true ) ) {
-		$output['default_schema_type'] = $input['default_schema_type'];
+	if ( 'general' === $tab || isset( $input['default_schema_type'] ) ) {
+		$valid_types                   = array_keys( verdix_get_schema_types() );
+		$output['default_schema_type'] = isset( $input['default_schema_type'] ) && in_array( $input['default_schema_type'], $valid_types, true )
+			? $input['default_schema_type']
+			: 'Product';
+
+		$output['default_author_name'] = isset( $input['default_author_name'] ) ? sanitize_text_field( $input['default_author_name'] ) : '';
+
+		$output['default_disclosure'] = isset( $input['default_disclosure'] ) && isset( verdix_get_disclosure_types()[ $input['default_disclosure'] ] )
+			? $input['default_disclosure']
+			: 'none';
+
+		$output['default_disclosure_text'] = isset( $input['default_disclosure_text'] ) ? sanitize_textarea_field( $input['default_disclosure_text'] ) : '';
+
+		$output['schema_output'] = isset( $input['schema_output'] ) && isset( verdix_get_schema_output_modes()[ $input['schema_output'] ] )
+			? $input['schema_output']
+			: 'auto';
+
+		$valid_positions            = array( 'bottom', 'top', 'both', 'manual' );
+		$output['default_position'] = isset( $input['default_position'] ) && in_array( $input['default_position'], $valid_positions, true )
+			? $input['default_position']
+			: 'manual';
+
+		$output['post_types'] = isset( $input['post_types'] ) && is_array( $input['post_types'] )
+			? array_values( array_intersect( array_map( 'sanitize_key', $input['post_types'] ), get_post_types( array( 'public' => true ) ) ) )
+			: array();
 	}
 
-	$output['default_author_name'] = '';
-	if ( isset( $input['default_author_name'] ) ) {
-		$output['default_author_name'] = sanitize_text_field( $input['default_author_name'] );
+	if ( 'appearance' === $tab || isset( $input['default_style'] ) ) {
+		$valid_styles            = array_keys( verdix_get_styles() );
+		$output['default_style'] = isset( $input['default_style'] ) && in_array( $input['default_style'], $valid_styles, true )
+			? $input['default_style']
+			: 'default';
+
+		$output['accent_color'] = ( isset( $input['accent_color'] ) ? sanitize_hex_color( $input['accent_color'] ) : '' ) ?: '#1e73be';
+		$output['bg_color']     = ( isset( $input['bg_color'] ) ? sanitize_hex_color( $input['bg_color'] ) : '' ) ?: '#fff';
+		$output['border_color'] = ( isset( $input['border_color'] ) ? sanitize_hex_color( $input['border_color'] ) : '' ) ?: '#e7e7e7';
 	}
 
-	$output['default_disclosure'] = 'none';
-	if ( isset( $input['default_disclosure'] ) && isset( verdix_get_disclosure_types()[ $input['default_disclosure'] ] ) ) {
-		$output['default_disclosure'] = $input['default_disclosure'];
-	}
-
-	$output['default_disclosure_text'] = '';
-	if ( isset( $input['default_disclosure_text'] ) ) {
-		$output['default_disclosure_text'] = sanitize_textarea_field( $input['default_disclosure_text'] );
-	}
-
-	$output['schema_output'] = 'auto';
-	if ( isset( $input['schema_output'] ) && isset( verdix_get_schema_output_modes()[ $input['schema_output'] ] ) ) {
-		$output['schema_output'] = $input['schema_output'];
-	}
-
-	$valid_positions = array( 'bottom', 'top', 'both', 'manual' );
-	$output['default_position'] = 'manual';
-	if ( isset( $input['default_position'] ) && in_array( $input['default_position'], $valid_positions, true ) ) {
-		$output['default_position'] = $input['default_position'];
-	}
-
-	$valid_styles            = array_keys( verdix_get_styles() );
-	$output['default_style'] = 'default';
-	if ( isset( $input['default_style'] ) && in_array( $input['default_style'], $valid_styles, true ) ) {
-		$output['default_style'] = $input['default_style'];
-	}
-
-	$output['accent_color'] = '#1e73be';
-	if ( isset( $input['accent_color'] ) ) {
-		$output['accent_color'] = sanitize_hex_color( $input['accent_color'] ) ?: '#1e73be';
-	}
-
-	$output['bg_color'] = '#fff';
-	if ( isset( $input['bg_color'] ) ) {
-		$output['bg_color'] = sanitize_hex_color( $input['bg_color'] ) ?: '#fff';
-	}
-
-	$output['border_color'] = '#e7e7e7';
-	if ( isset( $input['border_color'] ) ) {
-		$output['border_color'] = sanitize_hex_color( $input['border_color'] ) ?: '#e7e7e7';
-	}
-
-	$output['post_types'] = array( 'post' );
-	if ( isset( $input['post_types'] ) && is_array( $input['post_types'] ) ) {
-		$output['post_types'] = array_map( 'sanitize_key', $input['post_types'] );
-	}
-
-	return $output;
+	/**
+	 * Filter the settings after the core fields are sanitized.
+	 *
+	 * @param array  $output Settings about to be saved, already merged with the stored ones.
+	 * @param array  $input  Submitted settings.
+	 * @param string $tab    Settings tab that was submitted, or an empty string.
+	 */
+	return apply_filters( 'verdix_sanitize_settings', $output, $input, $tab );
 }
 
 // =========================================================================
@@ -372,9 +363,9 @@ function verdix_get_preview_review() {
 			__( 'Limited options', 'verdix-reviews' ),
 			__( 'Could be cheaper', 'verdix-reviews' ),
 		),
-		'cta_text'     => __( 'Visit Website', 'verdix-reviews' ),
+		'cta_text'     => __( 'Visit website', 'verdix-reviews' ),
 		'cta_url'      => '#',
-		'product_name' => __( 'Example Product', 'verdix-reviews' ),
+		'product_name' => __( 'Example product', 'verdix-reviews' ),
 		'style'        => '',
 		'position'     => '',
 		'schema_type'  => 'Product',

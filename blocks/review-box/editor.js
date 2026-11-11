@@ -200,7 +200,7 @@
 				onChange: function( val ) { change( { currency: val } ); }
 			} ),
 			el( TextControl, {
-				key: 'cta_text', label: __( 'Button Text', 'verdix-reviews' ), value: offer.cta_text,
+				key: 'cta_text', label: __( 'Button text', 'verdix-reviews' ), value: offer.cta_text,
 				placeholder: __( 'Check price', 'verdix-reviews' ),
 				onChange: function( val ) { change( { cta_text: val } ); }
 			} )
@@ -391,7 +391,7 @@
 			styleChildren.push(
 				el( SelectControl, {
 					key: 'style-select',
-					label: __( 'Review Box Style', 'verdix-reviews' ),
+					label: __( 'Review box style', 'verdix-reviews' ),
 					value: review.style || '',
 					options: styleOptions,
 					onChange: function( val ) { updateReview( { style: val } ); }
@@ -416,7 +416,7 @@
 			ratingTypeChildren.push(
 				el( SelectControl, {
 					key: 'type-select',
-					label: __( 'Rating Type', 'verdix-reviews' ),
+					label: __( 'Rating type', 'verdix-reviews' ),
 					value: review.rating_type || 'star',
 					options: ratingTypeOptions.map( function( t ) {
 						return { label: t.label, value: t.value };
@@ -435,7 +435,7 @@
 		}
 
 		inspectorPanels.push(
-			el( PanelBody, { key: 'rating-type', title: __( 'Rating Type', 'verdix-reviews' ), initialOpen: false },
+			el( PanelBody, { key: 'rating-type', title: __( 'Rating type', 'verdix-reviews' ), initialOpen: false },
 				ratingTypeChildren
 			)
 		);
@@ -443,7 +443,7 @@
 		inspectorPanels.push(
 			el( PanelBody, { key: 'position', title: __( 'Position', 'verdix-reviews' ), initialOpen: false },
 				el( SelectControl, {
-					label: __( 'Review Box Position', 'verdix-reviews' ),
+					label: __( 'Review box position', 'verdix-reviews' ),
 					value: review.position || '',
 					options: [
 						{ label: __( 'Use global default', 'verdix-reviews' ), value: '' },
@@ -504,9 +504,9 @@
 		} );
 
 		inspectorPanels.push(
-			el( PanelBody, { key: 'schema', title: __( 'Schema Settings', 'verdix-reviews' ), initialOpen: false },
+			el( PanelBody, { key: 'schema', title: __( 'Schema settings', 'verdix-reviews' ), initialOpen: false },
 				el( SelectControl, {
-					label: __( 'Schema Type', 'verdix-reviews' ),
+					label: __( 'Schema type', 'verdix-reviews' ),
 					value: review.schema_type,
 					options: schemaTypeOptions,
 					onChange: function( val ) { updateReview( { schema_type: val } ); }
@@ -514,7 +514,7 @@
 				typeNote ? el( Notice, { status: 'warning', isDismissible: false }, typeNote ) : null,
 				typeFieldControls,
 				el( TextControl, {
-					label: __( 'Product / Item Name', 'verdix-reviews' ),
+					label: __( 'Product / item name', 'verdix-reviews' ),
 					value: review.product_name,
 					onChange: function( val ) { updateReview( { product_name: val } ); },
 					placeholder: __( 'Defaults to post title', 'verdix-reviews' )
@@ -536,7 +536,7 @@
 					onChange: function( val ) { updateReview( { currency: val } ); }
 				} ),
 				el( TextControl, {
-					label: __( 'Author Name Override', 'verdix-reviews' ),
+					label: __( 'Author name override', 'verdix-reviews' ),
 					value: review.author_name,
 					onChange: function( val ) { updateReview( { author_name: val } ); },
 					placeholder: __( 'Uses default from settings', 'verdix-reviews' )
@@ -553,7 +553,7 @@
 		inspectorPanels.push(
 			el( PanelBody, { key: 'cta', title: __( 'CTA Button', 'verdix-reviews' ), initialOpen: false },
 				el( TextControl, {
-					label: __( 'Button Text', 'verdix-reviews' ),
+					label: __( 'Button text', 'verdix-reviews' ),
 					value: review.cta_text,
 					onChange: function( val ) { updateReview( { cta_text: val } ); },
 					placeholder: __( 'e.g., Visit Website', 'verdix-reviews' )
