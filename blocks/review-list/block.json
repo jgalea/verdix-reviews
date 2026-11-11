@@ -1,0 +1,23 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "verdix/review-list",
+	"version": "2.2.0",
+	"title": "Review List",
+	"category": "widgets",
+	"icon": "star-filled",
+	"description": "A list of your top rated or latest reviews.",
+	"keywords": [ "review", "rating", "top rated", "latest" ],
+	"textdomain": "verdix-reviews",
+	"attributes": {
+		"type": { "type": "string", "default": "top-rated" },
+		"count": { "type": "number", "default": 5 },
+		"schema_type": { "type": "string", "default": "" },
+		"category": { "type": "string", "default": "" },
+		"image": { "type": "boolean", "default": true }
+	},
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	}
+}

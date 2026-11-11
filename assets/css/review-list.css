@@ -1,0 +1,87 @@
+.verdix-list {
+	--sb-accent: #1e73be;
+	--sb-accent-light: #95bae0;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+	gap: 1rem;
+	margin: 1.5rem 0;
+	padding: 0;
+	list-style: none;
+}
+
+.verdix-list__item {
+	display: flex;
+	align-items: center;
+	gap: 0.875rem;
+	margin: 0;
+	padding: 0.75rem;
+	border: 1px solid #e7e7e7;
+	border-radius: 6px;
+	background: #fff;
+}
+
+.verdix-list__thumb {
+	flex: none;
+	inline-size: 4rem;
+	block-size: 4rem;
+}
+
+.verdix-list__thumb img {
+	display: block;
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+	border-radius: 4px;
+}
+
+.verdix-list__body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	min-inline-size: 0;
+}
+
+.verdix-list__title {
+	font-weight: 600;
+	line-height: 1.3;
+	overflow-wrap: anywhere;
+}
+
+.verdix-list__rating {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.verdix-list__score {
+	font-weight: 700;
+}
+
+.verdix-list__rating .verdix-box__stars {
+	display: inline-flex;
+	position: relative;
+	line-height: 1;
+}
+
+.verdix-list__rating .verdix-box__stars-background,
+.verdix-list__rating .verdix-box__stars-foreground {
+	display: inline-flex;
+	gap: 2px;
+}
+
+.verdix-list__rating .verdix-box__stars-background {
+	color: var(--sb-accent-light);
+}
+
+.verdix-list__rating .verdix-box__stars-foreground {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline-start: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	color: var(--sb-accent);
+}
+
+.verdix-list__empty {
+	color: #666;
+}
