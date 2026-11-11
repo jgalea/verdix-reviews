@@ -31,6 +31,37 @@ function verdix_rest_hide_protected_review( $response, $post ) {
 	return $response;
 }
 
+function verdix_upgrade_post_types() {
+	if ( get_option( 'verdix_post_types_synced' ) ) {
+		return;
+	}
+
+	global $wpdb;
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$reviewed = $wpdb->get_col(
+		$wpdb->prepare(
+			"SELECT DISTINCT p.post_type FROM {$wpdb->posts} p INNER JOIN {$wpdb->postmeta} pm ON pm.post_id = p.ID WHERE pm.meta_key = %s AND pm.meta_value != %s",
+			'_verdix_review',
+			''
+		)
+	);
+
+	$options = get_option( 'verdix_settings', array() );
+	if ( ! is_array( $options ) ) {
+		$options = array();
+	}
+	$current = isset( $options['post_types'] ) && is_array( $options['post_types'] ) ? $options['post_types'] : array( 'post', 'page' );
+	$merged  = array_values( array_unique( array_merge( $current, $reviewed ) ) );
+
+	if ( $merged !== $current ) {
+		$options['post_types'] = $merged;
+		update_option( 'verdix_settings', $options );
+	}
+
+	update_option( 'verdix_post_types_synced', 1 );
+}
+add_action( 'init', 'verdix_upgrade_post_types', 1 );
+
 function verdix_get_post_types() {
 	$options = get_option( 'verdix_settings', array() );
 	$types   = isset( $options['post_types'] ) && is_array( $options['post_types'] ) ? $options['post_types'] : array( 'post', 'page' );
