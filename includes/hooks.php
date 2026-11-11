@@ -148,7 +148,16 @@ function verdix_get_editor_config() {
 		);
 	}
 
+	$availability_config = array();
+	foreach ( verdix_get_availability_options() as $slug => $label ) {
+		$availability_config[] = array(
+			'value' => $slug,
+			'label' => $label,
+		);
+	}
+
 	$config = array(
+		'availability'    => $availability_config,
 		'disclosureTypes' => $disclosure_config,
 		'disclosurePresets' => verdix_get_disclosure_presets(),
 		'katinaActive'    => verdix_katina_active(),

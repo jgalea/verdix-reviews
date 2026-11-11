@@ -113,10 +113,10 @@ if ( empty( $cons ) ) {
 		<tr>
 			<th scope="row"><?php esc_html_e( 'Pros', 'verdix-reviews' ); ?></th>
 			<td>
-				<div class="verdix-repeater" data-field="pros">
+				<div class="verdix-repeater" data-field="pros" data-placeholder="<?php esc_attr_e( 'Add a pro...', 'verdix-reviews' ); ?>" data-label="<?php esc_attr_e( 'Pro', 'verdix-reviews' ); ?>">
 					<?php foreach ( $pros as $pro ) : ?>
 						<div class="verdix-repeater__row">
-							<input type="text" name="verdix_review_pros[]" value="<?php echo esc_attr( $pro ); ?>" class="regular-text" placeholder="<?php esc_attr_e( 'Add a pro...', 'verdix-reviews' ); ?>">
+							<input type="text" name="verdix_review_pros[]" value="<?php echo esc_attr( $pro ); ?>" class="regular-text" placeholder="<?php esc_attr_e( 'Add a pro...', 'verdix-reviews' ); ?>" aria-label="<?php esc_attr_e( 'Pro', 'verdix-reviews' ); ?>">
 							<button type="button" class="button verdix-repeater__remove" aria-label="<?php esc_attr_e( 'Remove', 'verdix-reviews' ); ?>">&times;</button>
 						</div>
 					<?php endforeach; ?>
@@ -128,10 +128,10 @@ if ( empty( $cons ) ) {
 		<tr>
 			<th scope="row"><?php esc_html_e( 'Cons', 'verdix-reviews' ); ?></th>
 			<td>
-				<div class="verdix-repeater" data-field="cons">
+				<div class="verdix-repeater" data-field="cons" data-placeholder="<?php esc_attr_e( 'Add a con...', 'verdix-reviews' ); ?>" data-label="<?php esc_attr_e( 'Con', 'verdix-reviews' ); ?>">
 					<?php foreach ( $cons as $con ) : ?>
 						<div class="verdix-repeater__row">
-							<input type="text" name="verdix_review_cons[]" value="<?php echo esc_attr( $con ); ?>" class="regular-text" placeholder="<?php esc_attr_e( 'Add a con...', 'verdix-reviews' ); ?>">
+							<input type="text" name="verdix_review_cons[]" value="<?php echo esc_attr( $con ); ?>" class="regular-text" placeholder="<?php esc_attr_e( 'Add a con...', 'verdix-reviews' ); ?>" aria-label="<?php esc_attr_e( 'Con', 'verdix-reviews' ); ?>">
 							<button type="button" class="button verdix-repeater__remove" aria-label="<?php esc_attr_e( 'Remove', 'verdix-reviews' ); ?>">&times;</button>
 						</div>
 					<?php endforeach; ?>
@@ -178,12 +178,14 @@ if ( empty( $cons ) ) {
 					)
 					: array();
 				$offer_blank  = array(
-					'merchant'    => '',
-					'price'       => '',
-					'currency'    => 'USD',
-					'url'         => '',
-					'cta_text'    => '',
-					'katina_link' => 0,
+					'merchant'          => '',
+					'price'             => '',
+					'currency'          => 'USD',
+					'url'               => '',
+					'cta_text'          => '',
+					'katina_link'       => 0,
+					'availability'      => '',
+					'price_valid_until' => '',
 				);
 				$saved_offers = is_array( $data['offers'] ) ? array_values( $data['offers'] ) : array();
 				?>
@@ -305,6 +307,29 @@ if ( empty( $cons ) ) {
 				<input type="text" id="verdix_review_product_name" name="verdix_review_product_name"
 					value="<?php echo esc_attr( $data['product_name'] ); ?>" class="regular-text"
 					placeholder="<?php esc_attr_e( 'Defaults to post title', 'verdix-reviews' ); ?>">
+			</td>
+		</tr>
+
+		<tr>
+			<th scope="row">
+				<label for="verdix_review_brand"><?php esc_html_e( 'Brand', 'verdix-reviews' ); ?></label>
+			</th>
+			<td>
+				<input type="text" id="verdix_review_brand" name="verdix_review_brand" value="<?php echo esc_attr( $data['brand'] ); ?>" class="regular-text">
+				<p class="description"><?php esc_html_e( 'Product schema only. Sent as the product brand.', 'verdix-reviews' ); ?></p>
+			</td>
+		</tr>
+
+		<tr>
+			<th scope="row"><?php esc_html_e( 'Product identifiers', 'verdix-reviews' ); ?></th>
+			<td>
+				<label for="verdix_review_sku"><?php esc_html_e( 'SKU', 'verdix-reviews' ); ?></label>
+				<input type="text" id="verdix_review_sku" name="verdix_review_sku" value="<?php echo esc_attr( $data['sku'] ); ?>" class="regular-text">
+				<label for="verdix_review_gtin"><?php esc_html_e( 'GTIN', 'verdix-reviews' ); ?></label>
+				<input type="text" id="verdix_review_gtin" name="verdix_review_gtin" value="<?php echo esc_attr( $data['gtin'] ); ?>" class="regular-text" inputmode="numeric">
+				<label for="verdix_review_mpn"><?php esc_html_e( 'MPN', 'verdix-reviews' ); ?></label>
+				<input type="text" id="verdix_review_mpn" name="verdix_review_mpn" value="<?php echo esc_attr( $data['mpn'] ); ?>" class="regular-text">
+				<p class="description"><?php esc_html_e( 'GTIN is the 8, 12, 13 or 14 digit barcode number.', 'verdix-reviews' ); ?></p>
 			</td>
 		</tr>
 

@@ -197,6 +197,28 @@ function verdix_build_schema( $post_id, $review ) {
 		$schema['review']['reviewBody'] = $review['summary'];
 	}
 
+	foreach ( array(
+		'positiveNotes' => 'pros',
+		'negativeNotes' => 'cons',
+	) as $property => $key ) {
+		if ( empty( $review[ $key ] ) || ! is_array( $review[ $key ] ) ) {
+			continue;
+		}
+		$position = 0;
+		$elements = array();
+		foreach ( $review[ $key ] as $note ) {
+			$elements[] = array(
+				'@type'    => 'ListItem',
+				'position' => ++$position,
+				'name'     => $note,
+			);
+		}
+		$schema['review'][ $property ] = array(
+			'@type'           => 'ItemList',
+			'itemListElement' => $elements,
+		);
+	}
+
 	// Add datePublished.
 	$schema['review']['datePublished'] = get_the_date( 'c', $post_id );
 
@@ -251,16 +273,22 @@ function verdix_build_schema( $post_id, $review ) {
  * @return array Modified schema.
  */
 function verdix_schema_product( $schema, $review ) {
-	$offers = verdix_schema_offers( $schema['url'], $review, 'https://schema.org/InStock' );
+	$offers = verdix_schema_offers( $schema['url'], $review, 'InStock' );
 	if ( $offers ) {
 		$schema['offers'] = $offers;
 	}
 
-	if ( ! empty( $review['product_name'] ) ) {
+	if ( ! empty( $review['brand'] ) ) {
 		$schema['brand'] = array(
 			'@type' => 'Brand',
-			'name'  => $review['product_name'],
+			'name'  => $review['brand'],
 		);
+	}
+
+	foreach ( array( 'sku', 'gtin', 'mpn' ) as $identifier ) {
+		if ( ! empty( $review[ $identifier ] ) ) {
+			$schema[ $identifier ] = $review[ $identifier ];
+		}
 	}
 
 	return $schema;
@@ -280,8 +308,12 @@ function verdix_schema_offers( $default_url, $review, $availability = '' ) {
 			'price'         => $offer['price'],
 			'priceCurrency' => ! empty( $offer['currency'] ) ? $offer['currency'] : 'USD',
 		);
-		if ( $availability ) {
-			$item['availability'] = $availability;
+		$offer_availability = ! empty( $offer['availability'] ) ? $offer['availability'] : $availability;
+		if ( $offer_availability ) {
+			$item['availability'] = 'https://schema.org/' . $offer_availability;
+		}
+		if ( ! empty( $offer['price_valid_until'] ) ) {
+			$item['priceValidUntil'] = $offer['price_valid_until'];
 		}
 		if ( ! empty( $offer['merchant'] ) ) {
 			$item['seller'] = array(

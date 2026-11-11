@@ -6,7 +6,7 @@
 		document.addEventListener( 'DOMContentLoaded', fn );
 	}
 
-	function buildRow( field ) {
+	function buildRow( field, container ) {
 		var row = document.createElement( 'div' );
 		row.className = 'verdix-repeater__row';
 
@@ -14,7 +14,8 @@
 		input.type = 'text';
 		input.name = 'verdix_review_' + field + '[]';
 		input.className = 'regular-text';
-		input.placeholder = field === 'pros' ? 'Add a pro...' : 'Add a con...';
+		input.placeholder = container.getAttribute( 'data-placeholder' ) || '';
+		input.setAttribute( 'aria-label', container.getAttribute( 'data-label' ) || '' );
 		row.appendChild( input );
 
 		var remove = document.createElement( 'button' );
@@ -66,7 +67,7 @@
 				var field = target.getAttribute( 'data-target' );
 				var container = box.querySelector( '.verdix-repeater[data-field="' + field + '"]' );
 				if ( container ) {
-					var row = buildRow( field );
+					var row = buildRow( field, container );
 					container.appendChild( row );
 					var firstInput = row.querySelector( 'input' );
 					if ( firstInput ) { firstInput.focus(); }

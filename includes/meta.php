@@ -207,6 +207,13 @@ function verdix_sanitize_data( $data ) {
 		$clean['product_name'] = sanitize_text_field( $data['product_name'] );
 	}
 
+	foreach ( array( 'brand', 'sku', 'mpn' ) as $identifier ) {
+		$clean[ $identifier ] = isset( $data[ $identifier ] ) ? sanitize_text_field( $data[ $identifier ] ) : '';
+	}
+
+	$gtin          = isset( $data['gtin'] ) ? preg_replace( '/\D/', '', (string) $data['gtin'] ) : '';
+	$clean['gtin'] = in_array( strlen( $gtin ), array( 8, 12, 13, 14 ), true ) ? $gtin : '';
+
 	$clean['price'] = '';
 	if ( isset( $data['price'] ) ) {
 		$clean['price'] = sanitize_text_field( $data['price'] );
@@ -324,6 +331,10 @@ function verdix_get_defaults() {
 		'cons'         => array(),
 		'schema_type'  => isset( $options['default_schema_type'] ) ? $options['default_schema_type'] : 'Product',
 		'product_name' => '',
+		'brand'        => '',
+		'sku'          => '',
+		'gtin'         => '',
+		'mpn'          => '',
 		'price'        => '',
 		'currency'     => 'USD',
 		'cta_text'     => '',

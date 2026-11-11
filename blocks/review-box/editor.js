@@ -32,7 +32,7 @@
 
 	var DEFAULTS = window.verdixDefaults || {
 		rating: 0, rating_type: 'star', style: '', position: '', heading: '', summary: '', pros: [], cons: [],
-		schema_type: 'Product', product_name: '', price: '', currency: 'USD',
+		schema_type: 'Product', product_name: '', brand: '', sku: '', gtin: '', mpn: '', price: '', currency: 'USD',
 		cta_text: '', cta_url: '', offers: [], disclosure: '', disclosure_text: '', last_tested: '',
 		author_name: '', type_fields: {}
 	};
@@ -203,6 +203,15 @@
 				key: 'cta_text', label: __( 'Button text', 'verdix-reviews' ), value: offer.cta_text,
 				placeholder: __( 'Check price', 'verdix-reviews' ),
 				onChange: function( val ) { change( { cta_text: val } ); }
+			} ),
+			el( SelectControl, {
+				key: 'availability', label: __( 'Availability', 'verdix-reviews' ), value: offer.availability || '',
+				options: [ { label: __( 'In stock', 'verdix-reviews' ), value: '' } ].concat( ( CONFIG.availability || [] ).filter( function( a ) { return a.value !== 'InStock'; } ) ),
+				onChange: function( val ) { change( { availability: val } ); }
+			} ),
+			el( TextControl, {
+				key: 'price_valid_until', label: __( 'Price valid until', 'verdix-reviews' ), type: 'date', value: offer.price_valid_until || '',
+				onChange: function( val ) { change( { price_valid_until: val } ); }
 			} )
 		];
 
@@ -520,6 +529,27 @@
 					placeholder: __( 'Defaults to post title', 'verdix-reviews' )
 				} ),
 				el( TextControl, {
+					label: __( 'Brand', 'verdix-reviews' ),
+					value: review.brand,
+					onChange: function( val ) { updateReview( { brand: val } ); }
+				} ),
+				el( TextControl, {
+					label: __( 'SKU', 'verdix-reviews' ),
+					value: review.sku,
+					onChange: function( val ) { updateReview( { sku: val } ); }
+				} ),
+				el( TextControl, {
+					label: __( 'GTIN', 'verdix-reviews' ),
+					value: review.gtin,
+					help: __( '8, 12, 13 or 14 digit barcode number.', 'verdix-reviews' ),
+					onChange: function( val ) { updateReview( { gtin: val } ); }
+				} ),
+				el( TextControl, {
+					label: __( 'MPN', 'verdix-reviews' ),
+					value: review.mpn,
+					onChange: function( val ) { updateReview( { mpn: val } ); }
+				} ),
+				el( TextControl, {
 					label: __( 'Price', 'verdix-reviews' ),
 					value: review.price,
 					onChange: function( val ) { updateReview( { price: val } ); },
@@ -551,12 +581,12 @@
 		);
 
 		inspectorPanels.push(
-			el( PanelBody, { key: 'cta', title: __( 'CTA Button', 'verdix-reviews' ), initialOpen: false },
+			el( PanelBody, { key: 'cta', title: __( 'CTA button', 'verdix-reviews' ), initialOpen: false },
 				el( TextControl, {
 					label: __( 'Button text', 'verdix-reviews' ),
 					value: review.cta_text,
 					onChange: function( val ) { updateReview( { cta_text: val } ); },
-					placeholder: __( 'e.g., Visit Website', 'verdix-reviews' )
+					placeholder: __( 'e.g., Visit website', 'verdix-reviews' )
 				} ),
 				el( TextControl, {
 					label: __( 'Button URL', 'verdix-reviews' ),
@@ -589,7 +619,7 @@
 				el( Button, {
 					variant: 'secondary',
 					onClick: function() {
-						updateReview( { offers: offers.concat( [ { merchant: '', price: '', currency: 'USD', url: '', cta_text: '', katina_link: 0 } ] ) } );
+						updateReview( { offers: offers.concat( [ { merchant: '', price: '', currency: 'USD', url: '', cta_text: '', katina_link: 0, availability: '', price_valid_until: '' } ] ) } );
 					}
 				}, __( '+ Add offer', 'verdix-reviews' ) )
 			)
@@ -618,6 +648,24 @@
 					value: review.last_tested,
 					onChange: function( val ) { updateReview( { last_tested: val } ); }
 				} )
+			)
+		);
+
+		inspectorPanels.push(
+			el( PanelBody, { key: 'remove', title: __( 'Remove review', 'verdix-reviews' ), initialOpen: false },
+				el( 'p', { className: 'components-base-control__help' },
+					__( 'Review data stays saved with the post when you delete this block. Remove it here to stop its schema from printing.', 'verdix-reviews' )
+				),
+				el( Button, {
+					variant: 'secondary',
+					isDestructive: true,
+					onClick: function() {
+						if ( window.confirm( __( 'Remove the review data from this post?', 'verdix-reviews' ) ) ) {
+							setReviewState( Object.assign( {}, DEFAULTS ) );
+							setMeta( Object.assign( {}, rawMeta, { _verdix_review: '' } ) );
+						}
+					}
+				}, __( 'Remove review data', 'verdix-reviews' ) )
 			)
 		);
 
