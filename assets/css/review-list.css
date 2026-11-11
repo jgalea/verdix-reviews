@@ -73,6 +73,10 @@
 	color: var(--sb-accent-light);
 }
 
+.verdix-list__rating .verdix-box__stars-foreground svg {
+	flex-shrink: 0;
+}
+
 .verdix-list__rating .verdix-box__stars-foreground {
 	position: absolute;
 	inset-block-start: 0;
