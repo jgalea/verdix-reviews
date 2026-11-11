@@ -61,7 +61,7 @@ function verdix_render_review_list( $args ) {
 			: '';
 	}
 
-	wp_enqueue_style( 'verdix-review-list', VERDIX_URL . 'assets/css/review-list.css', array(), VERDIX_VERSION );
+	wp_enqueue_style( 'verdix-review-list' );
 
 	$options      = get_option( 'verdix_settings', array() );
 	$accent       = ! empty( $options['accent_color'] ) ? $options['accent_color'] : '#1e73be';
@@ -119,6 +119,8 @@ add_shortcode( 'verdix_list', 'verdix_review_list_shortcode' );
 function verdix_register_review_list_block() {
 	$block_dir = VERDIX_DIR . 'blocks/review-list';
 
+	wp_register_style( 'verdix-review-list', VERDIX_URL . 'assets/css/review-list.css', array(), VERDIX_VERSION );
+
 	wp_register_script(
 		'verdix-list-editor',
 		VERDIX_URL . 'blocks/review-list/editor.js',
@@ -141,6 +143,7 @@ function verdix_register_review_list_block() {
 		array(
 			'render_callback' => 'verdix_render_review_list_block',
 			'editor_script'   => 'verdix-list-editor',
+			'style'           => 'verdix-review-list',
 		)
 	);
 }
