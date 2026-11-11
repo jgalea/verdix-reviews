@@ -497,11 +497,11 @@ function verdix_column_orderby( $query ) {
 }
 
 /**
- * One-shot backfill: populate _verdix_rating_sort for existing reviews that
- * were saved before this companion meta was introduced.
+ * One-shot sync: rebuild _verdix_rating_sort for every review, so reviews saved
+ * through the block editor or removed earlier don't leave a stale value behind.
  */
 function verdix_maybe_backfill_rating_sort() {
-	if ( get_option( 'verdix_rating_sort_backfilled' ) ) {
+	if ( get_option( 'verdix_rating_sort_synced' ) ) {
 		return;
 	}
 	if ( ! is_admin() || ! current_user_can( 'manage_options' ) ) {
@@ -509,30 +509,30 @@ function verdix_maybe_backfill_rating_sort() {
 	}
 
 	global $wpdb;
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	$post_ids = $wpdb->get_col(
 		$wpdb->prepare(
-			"SELECT pm.post_id
-			FROM {$wpdb->postmeta} pm
-			LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = pm.post_id AND pm2.meta_key = %s
-			WHERE pm.meta_key = %s AND pm.meta_value != %s AND pm2.meta_id IS NULL",
-			'_verdix_rating_sort',
+			"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value != %s",
 			'_verdix_review',
 			''
 		)
 	);
 
+	$wpdb->query(
+		$wpdb->prepare(
+			"DELETE FROM {$wpdb->postmeta} WHERE meta_key = %s AND post_id NOT IN ( SELECT post_id FROM ( SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value != %s ) AS reviewed )",
+			'_verdix_rating_sort',
+			'_verdix_review',
+			''
+		)
+	);
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
 	foreach ( $post_ids as $pid ) {
-		$review = verdix_get_review( (int) $pid );
-		if ( ! $review ) {
-			continue;
-		}
-		$rating_type = ! empty( $review['rating_type'] ) ? $review['rating_type'] : 'star';
-		$sort_val    = verdix_normalize_to_star_scale( $review['rating'], $rating_type );
-		update_post_meta( (int) $pid, '_verdix_rating_sort', $sort_val );
+		verdix_sync_rating_sort( 0, (int) $pid, '_verdix_review' );
 	}
 
-	update_option( 'verdix_rating_sort_backfilled', 1 );
+	update_option( 'verdix_rating_sort_synced', 1 );
 }
 add_action( 'admin_init', 'verdix_maybe_backfill_rating_sort' );
 

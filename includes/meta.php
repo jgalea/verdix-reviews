@@ -317,15 +317,33 @@ function verdix_get_review( $post_id ) {
  */
 function verdix_save_review( $post_id, $data ) {
 	$clean  = verdix_sanitize_data( $data );
-	$result = update_post_meta( $post_id, '_verdix_review', wp_slash( wp_json_encode( $clean ) ) );
-
-	// Companion meta in 0-5 scale so the admin Rating column can sort numerically.
-	$rating_type = ! empty( $clean['rating_type'] ) ? $clean['rating_type'] : 'star';
-	$rating_sort = verdix_normalize_to_star_scale( $clean['rating'], $rating_type );
-	update_post_meta( $post_id, '_verdix_rating_sort', $rating_sort );
-
-	return $result;
+	return update_post_meta( $post_id, '_verdix_review', wp_slash( wp_json_encode( $clean ) ) );
 }
+
+// Companion meta in 0-5 scale so the admin Rating column and review lists can sort numerically.
+function verdix_sync_rating_sort( $meta_id, $post_id, $meta_key ) {
+	if ( '_verdix_review' !== $meta_key ) {
+		return;
+	}
+
+	$review = verdix_get_review( $post_id );
+	if ( ! $review || empty( $review['rating'] ) ) {
+		delete_post_meta( $post_id, '_verdix_rating_sort' );
+		return;
+	}
+
+	$rating_type = ! empty( $review['rating_type'] ) ? $review['rating_type'] : 'star';
+	update_post_meta( $post_id, '_verdix_rating_sort', verdix_normalize_to_star_scale( $review['rating'], $rating_type ) );
+}
+add_action( 'added_post_meta', 'verdix_sync_rating_sort', 10, 3 );
+add_action( 'updated_post_meta', 'verdix_sync_rating_sort', 10, 3 );
+
+function verdix_clear_rating_sort( $meta_ids, $post_id, $meta_key ) {
+	if ( '_verdix_review' === $meta_key ) {
+		delete_post_meta( $post_id, '_verdix_rating_sort' );
+	}
+}
+add_action( 'deleted_post_meta', 'verdix_clear_rating_sort', 10, 3 );
 
 /**
  * Merge partial review fields into the saved review and save through the sanitizer.
