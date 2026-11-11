@@ -215,6 +215,10 @@ if ( ! empty( $recent_ids ) ) {
 						<p><code>[verdix]</code> <?php esc_html_e( 'or', 'verdix-reviews' ); ?> <code>[verdix id="123"]</code></p>
 					</div>
 					<div class="verdix-hint">
+						<strong><?php esc_html_e( 'Review list', 'verdix-reviews' ); ?></strong>
+						<p><?php esc_html_e( 'Add the "Review List" block, or use', 'verdix-reviews' ); ?> <code>[verdix_list type="top-rated" count="5"]</code>. <?php esc_html_e( 'Other options: type="latest", schema_type, category and image="false".', 'verdix-reviews' ); ?></p>
+					</div>
+					<div class="verdix-hint">
 						<strong><?php esc_html_e( 'REST API', 'verdix-reviews' ); ?></strong>
 						<p><code>/wp-json/verdix/v1/review/{id}</code></p>
 					</div>

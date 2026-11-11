@@ -25,6 +25,7 @@ Your own score is marked up as a Review. Verdix doesn't present an editor's scor
 = Features =
 
 * Review Box block with live preview, a classic editor meta box and a `[verdix]` shortcode
+* Review List block and `[verdix_list]` shortcode for top rated and latest reviews
 * Star ratings in half-star steps, pros and cons, summary and verdict heading
 * 14 schema.org types (Product, Software Application, Book, Movie, TV Series, Video Game, Music Album, Recipe, Course, Event, Local Business, Restaurant, Creative Work, Thing) with optional per-type fields
 * Several offers per product, each with merchant, price and button, output as Offer or AggregateOffer
@@ -52,6 +53,10 @@ Your own score is marked up as a Review. Verdix doesn't present an editor's scor
 = How do I use the shortcode? =
 
 Use `[verdix]` to display the review box for the current post, or `[verdix id="123"]` for a specific post.
+
+= How do I show my top rated or latest reviews? =
+
+Add the Review List block, or use `[verdix_list]`. Options: `type` ("top-rated" or "latest"), `count` (1 to 20), `schema_type`, `category` and `image` ("true" or "false"). For example `[verdix_list type="latest" count="3" image="false"]`.
 
 = How do I migrate from WP Review Pro? =
 
