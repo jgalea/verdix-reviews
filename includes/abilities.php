@@ -46,11 +46,7 @@ function verdix_ability_review_schema() {
 }
 
 function verdix_ability_can_read( $post_id ) {
-	$post = get_post( $post_id );
-	if ( ! $post ) {
-		return true;
-	}
-	return 'publish' === $post->post_status || current_user_can( 'read_post', $post->ID );
+	return ! get_post( $post_id ) || verdix_can_view_review( $post_id );
 }
 
 function verdix_ability_can_edit( $input ) {
@@ -103,10 +99,12 @@ function verdix_ability_list_reviews( $input ) {
 		);
 	}
 
-	$query = new WP_Query(
+	$all_access = current_user_can( 'edit_others_posts' );
+	$query      = new WP_Query(
 		array(
-			'post_type'              => apply_filters( 'verdix_post_types', array( 'post', 'page' ) ),
-			'post_status'            => current_user_can( 'edit_posts' ) ? 'any' : 'publish',
+			'post_type'              => verdix_get_post_types(),
+			'post_status'            => $all_access ? 'any' : 'publish',
+			'has_password'           => $all_access ? null : false,
 			'posts_per_page'         => isset( $input['per_page'] ) ? absint( $input['per_page'] ) : 20,
 			'paged'                  => isset( $input['page'] ) ? absint( $input['page'] ) : 1,
 			'meta_query'             => $meta_query, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
@@ -119,6 +117,9 @@ function verdix_ability_list_reviews( $input ) {
 
 	$items = array();
 	foreach ( $query->posts as $post ) {
+		if ( ! verdix_can_view_review( $post ) ) {
+			continue;
+		}
 		$items[] = array(
 			'post_id' => $post->ID,
 			'title'   => get_the_title( $post ),

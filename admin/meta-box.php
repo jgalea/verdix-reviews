@@ -10,7 +10,7 @@ function verdix_add_meta_box() {
 		return;
 	}
 
-	$post_types = apply_filters( 'verdix_post_types', array( 'post', 'page' ) );
+	$post_types = verdix_get_post_types();
 
 	foreach ( $post_types as $post_type ) {
 		add_meta_box(

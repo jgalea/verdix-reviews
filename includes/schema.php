@@ -103,9 +103,9 @@ function verdix_output_schema() {
 	}
 
 	$post_id = get_the_ID();
-	$review  = verdix_get_review( $post_id );
+	$review  = verdix_get_schema_review( $post_id );
 
-	if ( ! $review || empty( $review['rating'] ) ) {
+	if ( ! $review ) {
 		return;
 	}
 
@@ -114,10 +114,7 @@ function verdix_output_schema() {
 		return;
 	}
 
-	// Single script tag output — no duplicates.
-	$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-	// Prevent breaking out of the script tag (standard JSON-LD safety encoding).
-	$json = str_replace( '</', '<\/', $json );
+	$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP );
 	printf(
 		'<script type="application/ld+json">%s</script>' . "\n",
 		$json // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with script-tag-safe escaping.
@@ -157,13 +154,12 @@ function verdix_build_schema( $post_id, $review ) {
 	}
 
 	// Product name: review-level override > post title.
-	$product_name = ! empty( $review['product_name'] ) ? $review['product_name'] : get_the_title( $post_id );
+	$post_title   = wp_strip_all_tags( $post->post_title );
+	$product_name = ! empty( $review['product_name'] ) ? $review['product_name'] : $post_title;
 
 	// Normalize rating to 0-5 scale for schema output.
 	$rating_type     = ! empty( $review['rating_type'] ) ? $review['rating_type'] : 'star';
 	$schema_rating   = verdix_normalize_to_star_scale( $review['rating'], $rating_type );
-
-	$review_name = get_the_title( $post_id );
 
 	$schema = array(
 		'@context'        => 'https://schema.org',
@@ -171,7 +167,7 @@ function verdix_build_schema( $post_id, $review ) {
 		'name'            => $product_name,
 		'review'          => array(
 			'@type'        => 'Review',
-			'name'         => $review_name,
+			'name'         => $post_title,
 			'author'       => array(
 				'@type' => 'Person',
 				'name'  => $author_name,

@@ -546,10 +546,7 @@ function verdix_maybe_backfill_rating_sort() {
 add_action( 'admin_init', 'verdix_maybe_backfill_rating_sort' );
 
 function verdix_register_post_columns() {
-	$options    = get_option( 'verdix_settings', array() );
-	$post_types = apply_filters( 'verdix_post_types', isset( $options['post_types'] ) ? $options['post_types'] : array( 'post', 'page' ) );
-
-	foreach ( $post_types as $post_type ) {
+	foreach ( verdix_get_post_types() as $post_type ) {
 		add_filter( "manage_{$post_type}_posts_columns", 'verdix_add_post_columns' );
 		add_action( "manage_{$post_type}_posts_custom_column", 'verdix_render_post_column', 10, 2 );
 		add_filter( "manage_edit-{$post_type}_sortable_columns", 'verdix_sortable_columns' );

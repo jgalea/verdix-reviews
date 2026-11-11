@@ -248,7 +248,11 @@ function verdix_auto_insert_content( $content ) {
 	}
 
 	$review = verdix_get_review( $post_id );
-	if ( ! $review || empty( $review['rating'] ) ) {
+	if ( ! $review || empty( $review['rating'] ) || ! verdix_can_view_review( $post_id ) ) {
+		return $content;
+	}
+
+	if ( has_block( 'verdix/review-box', $content ) || has_shortcode( $content, 'verdix' ) ) {
 		return $content;
 	}
 

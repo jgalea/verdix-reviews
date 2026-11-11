@@ -5,9 +5,7 @@ defined( 'ABSPATH' ) || exit;
  * Register the _verdix_review meta key for the REST API and block editor.
  */
 function verdix_register_meta() {
-	$post_types = apply_filters( 'verdix_post_types', array( 'post', 'page' ) );
-
-	foreach ( $post_types as $post_type ) {
+	foreach ( verdix_get_post_types() as $post_type ) {
 		register_post_meta(
 			$post_type,
 			'_verdix_review',
@@ -15,15 +13,63 @@ function verdix_register_meta() {
 				'type'              => 'string',
 				'single'            => true,
 				'show_in_rest'      => true,
-				'auth_callback'     => function () {
-					return current_user_can( 'edit_posts' );
+				'auth_callback'     => function ( $allowed, $meta_key, $post_id ) {
+					return current_user_can( 'edit_post', $post_id );
 				},
 				'sanitize_callback' => 'verdix_sanitize_meta',
 			)
 		);
+		add_filter( "rest_prepare_{$post_type}", 'verdix_rest_hide_protected_review', 10, 2 );
 	}
 }
 add_action( 'init', 'verdix_register_meta' );
+
+function verdix_rest_hide_protected_review( $response, $post ) {
+	if ( ! verdix_can_view_review( $post ) && isset( $response->data['meta']['_verdix_review'] ) ) {
+		$response->data['meta']['_verdix_review'] = '';
+	}
+	return $response;
+}
+
+function verdix_get_post_types() {
+	$options = get_option( 'verdix_settings', array() );
+	$types   = isset( $options['post_types'] ) && is_array( $options['post_types'] ) ? $options['post_types'] : array( 'post', 'page' );
+
+	return apply_filters( 'verdix_post_types', $types );
+}
+
+function verdix_can_view_review( $post ) {
+	$post = get_post( $post );
+	if ( ! $post ) {
+		return false;
+	}
+	if ( current_user_can( 'edit_post', $post->ID ) ) {
+		return true;
+	}
+	if ( post_password_required( $post ) ) {
+		return false;
+	}
+	return 'publish' === $post->post_status || current_user_can( 'read_post', $post->ID );
+}
+
+function verdix_box_is_displayed( $post, $review ) {
+	$options  = get_option( 'verdix_settings', array() );
+	$position = ! empty( $review['position'] ) ? $review['position'] : ( isset( $options['default_position'] ) ? $options['default_position'] : 'manual' );
+	$shown    = 'manual' !== $position || has_block( 'verdix/review-box', $post ) || has_shortcode( $post->post_content, 'verdix' );
+
+	return (bool) apply_filters( 'verdix_box_is_displayed', $shown, $post, $review );
+}
+
+function verdix_get_schema_review( $post_id ) {
+	$post   = get_post( $post_id );
+	$review = $post ? verdix_get_review( $post->ID ) : null;
+
+	if ( ! $review || empty( $review['rating'] ) || ! verdix_can_view_review( $post ) || ! verdix_box_is_displayed( $post, $review ) ) {
+		return null;
+	}
+
+	return $review;
+}
 
 /**
  * Sanitize the _verdix_review meta value.
@@ -168,7 +214,7 @@ function verdix_sanitize_data( $data ) {
 
 	$clean['currency'] = 'USD';
 	if ( isset( $data['currency'] ) ) {
-		$clean['currency'] = sanitize_text_field( $data['currency'] );
+		$clean['currency'] = verdix_sanitize_currency( $data['currency'] );
 	}
 
 	$clean['cta_text'] = '';
