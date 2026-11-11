@@ -74,6 +74,11 @@ function verdix_get_migration_sources() {
  * @return int
  */
 function verdix_count_all_migratable() {
+	$cached = get_transient( 'verdix_migratable_count' );
+	if ( false !== $cached ) {
+		return (int) $cached;
+	}
+
 	$total = 0;
 	foreach ( verdix_get_migration_sources() as $source ) {
 		if ( isset( $source['detect'] ) && is_callable( $source['detect'] ) ) {
@@ -81,6 +86,8 @@ function verdix_count_all_migratable() {
 			$total += is_array( $posts ) ? count( $posts ) : 0;
 		}
 	}
+	set_transient( 'verdix_migratable_count', $total, HOUR_IN_SECONDS );
+
 	return $total;
 }
 

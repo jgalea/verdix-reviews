@@ -145,8 +145,7 @@ $total_migratable = array_sum( wp_list_pluck( $detected, 'total' ) );
 				<tbody>
 					<?php foreach ( $posts as $post ) : ?>
 						<?php
-						$existing = get_post_meta( $post->ID, '_verdix_review', true );
-						$already  = ! empty( $existing );
+						$already  = verdix_post_has_verdix_data( $post->ID );
 						$row_data = is_callable( $source_config['row_data'] ) ? call_user_func( $source_config['row_data'], $post ) : array();
 						?>
 						<tr id="verdix-migrate-row-<?php echo esc_attr( $post->ID ); ?>">
