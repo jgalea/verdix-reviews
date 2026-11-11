@@ -4,7 +4,7 @@ Tags: review, rating, schema, review box, rich snippets
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,6 +91,16 @@ Yes. By default Verdix adds the review to the SEO plugin's schema graph. You can
 1. The frontend review box: star rating, summary, and pros/cons rendered on a single post.
 
 == Changelog ==
+
+= 2.2.0 =
+* New: Review List block and `[verdix_list]` shortcode for top rated and latest reviews.
+* New: Pros and cons notes, brand, SKU, GTIN and MPN fields, and per-offer availability and price validity in the schema.
+* New: Remove review data button in the block sidebar.
+* Fixed: reviews with accents or quotes saved from the meta box, REST API, abilities and migration lost characters.
+* Fixed: post types that already had reviews stay enabled after updating.
+* Fixed: rating sort stays correct when reviews are saved in the block editor or removed.
+* Fixed: reviews of private, draft and password-protected posts no longer show up in lists, shortcodes or the REST API.
+* Fixed: settings saved on one tab no longer reset the other.
 
 = 2.1.0 =
 * New: Schema check panel in the editor, with Rich Results Test link and warnings for review types Google won't show stars for.
