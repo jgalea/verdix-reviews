@@ -92,58 +92,85 @@
 		} );
 	} );
 
-	// Bulk migration — one handler for all "Migrate All" buttons.
-	document.querySelectorAll( '.verdix-migrate-all-btn' ).forEach( function( migrateAllBtn ) {
-		migrateAllBtn.addEventListener( 'click', function() {
-			if ( ! confirm( i18n.confirmAll || 'Migrate all posts? This cannot be undone.' ) ) {
+	// Bulk migration: fetch the ids, then migrate them in batches so large sites don't time out.
+	function post( action, fields ) {
+		var data = new FormData();
+		data.append( 'action', action );
+		data.append( 'nonce', nonce );
+		Object.keys( fields ).forEach( function( key ) {
+			[].concat( fields[ key ] ).forEach( function( value ) {
+				data.append( Array.isArray( fields[ key ] ) ? key + '[]' : key, value );
+			} );
+		} );
+		return fetch( ajaxUrl, { method: 'POST', body: data } ).then( function( r ) {
+			return r.json();
+		} );
+	}
+
+	document.querySelectorAll( '.verdix-migrate-all-btn' ).forEach( function( button ) {
+		button.addEventListener( 'click', function() {
+			var source = this.getAttribute( 'data-source' ) || 'wp_review_pro';
+			var replace = replaceFlag( source );
+			var confirmText = replace ? i18n.confirmReplace : i18n.confirmAll;
+			if ( ! window.confirm( confirmText || 'Migrate all posts?' ) ) {
 				return;
 			}
 
-			var source = this.getAttribute( 'data-source' ) || 'wp_review_pro';
+			var statusDiv = document.getElementById( 'verdix-migration-status' );
+			var msgEl = document.getElementById( 'verdix-migration-message' );
+			var migrated = 0;
+			var errors = [];
 
-			this.disabled = true;
-			this.textContent = i18n.migrating || 'Migrating...';
+			function show( cls, text ) {
+				statusDiv.style.display = 'block';
+				statusDiv.className = 'notice ' + cls;
+				msgEl.textContent = text;
+			}
 
-			var data = new FormData();
-			data.append( 'action', 'verdix_migrate_all' );
-			data.append( 'nonce', nonce );
-			data.append( 'source', source );
-			data.append( 'replace', replaceFlag( source ) );
+			function fail( text ) {
+				show( 'notice-error', text );
+				button.disabled = false;
+				button.textContent = i18n.retry || 'Retry migration';
+			}
 
-			var currentBtn = this;
+			button.disabled = true;
+			button.textContent = i18n.migrating || 'Migrating...';
 
-			fetch( ajaxUrl, { method: 'POST', body: data } )
-				.then( function( r ) {
-					return r.json();
-				} )
-				.then( function( resp ) {
-					var statusDiv = document.getElementById( 'verdix-migration-status' );
-					var msgEl = document.getElementById( 'verdix-migration-message' );
+			post( 'verdix_migration_ids', { source: source } ).then( function( resp ) {
+				if ( ! resp.success ) {
+					fail( resp.data.message );
+					return;
+				}
+				var ids = resp.data.ids;
+				var total = ids.length;
 
-					statusDiv.style.display = 'block';
-
-					if ( resp.success ) {
-						statusDiv.className = 'notice notice-success';
-						var msg = resp.data.message;
-						if ( resp.data.errors && resp.data.errors.length > 0 ) {
-							msg += ' Errors: ' + resp.data.errors.join( '; ' );
-						}
-						msgEl.textContent = msg;
-						// Reload to refresh statuses.
+				function next() {
+					if ( ! ids.length ) {
+						var text = ( i18n.done || '%s' ).replace( '%s', migrated );
+						show( errors.length ? 'notice-warning' : 'notice-success', text + ( errors.length ? ' ' + errors.join( '; ' ) : '' ) );
 						setTimeout( function() {
 							window.location.reload();
-						}, 1500 );
-					} else {
-						statusDiv.className = 'notice notice-error';
-						msgEl.textContent = resp.data.message;
-						currentBtn.disabled = false;
-						currentBtn.textContent = i18n.retry || 'Retry Migration';
+						}, 2500 );
+						return;
 					}
-				} )
-				.catch( function() {
-					currentBtn.disabled = false;
-					currentBtn.textContent = i18n.retry || 'Retry Migration';
-				} );
+					post( 'verdix_migrate_batch', { source: source, replace: replace, ids: ids.splice( 0, 20 ) } ).then( function( batch ) {
+						if ( ! batch.success ) {
+							fail( batch.data.message );
+							return;
+						}
+						migrated += batch.data.migrated;
+						errors = errors.concat( batch.data.errors );
+						show( 'notice-info', ( i18n.progress || '%1$s / %2$s' ).replace( '%1$s', migrated ).replace( '%2$s', total ) );
+						next();
+					} ).catch( function() {
+						fail( i18n.error || 'Error' );
+					} );
+				}
+
+				next();
+			} ).catch( function() {
+				fail( i18n.error || 'Error' );
+			} );
 		} );
 	} );
 } )();

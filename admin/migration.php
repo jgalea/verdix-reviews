@@ -28,6 +28,7 @@ function verdix_ajax_migrate() {
 	}
 
 	$result = verdix_migrate_post( $post_id, $source, $replace );
+	delete_transient( 'verdix_migratable_count' );
 
 	if ( is_wp_error( $result ) ) {
 		wp_send_json_error( array( 'message' => $result->get_error_message() ) );
@@ -47,9 +48,36 @@ function verdix_ajax_migrate() {
 add_action( 'wp_ajax_verdix_migrate', 'verdix_ajax_migrate' );
 
 /**
- * Handle bulk migration AJAX request.
+ * List the post IDs a source can still migrate, so the browser can migrate them in batches.
  */
-function verdix_ajax_migrate_all() {
+function verdix_ajax_migration_ids() {
+	check_ajax_referer( 'verdix_migrate', 'nonce' );
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( array( 'message' => __( 'Permission denied.', 'verdix-reviews' ) ) );
+	}
+
+	$source  = isset( $_POST['source'] ) ? sanitize_text_field( wp_unslash( $_POST['source'] ) ) : 'wp_review_pro';
+	$sources = verdix_get_migration_sources();
+	if ( ! isset( $sources[ $source ] ) ) {
+		wp_send_json_error( array( 'message' => __( 'Unknown source.', 'verdix-reviews' ) ) );
+	}
+
+	$ids = array();
+	foreach ( call_user_func( $sources[ $source ]['detect'] ) as $post ) {
+		if ( ! verdix_post_has_verdix_data( $post->ID ) ) {
+			$ids[] = $post->ID;
+		}
+	}
+
+	wp_send_json_success( array( 'ids' => $ids ) );
+}
+add_action( 'wp_ajax_verdix_migration_ids', 'verdix_ajax_migration_ids' );
+
+/**
+ * Migrate one batch of posts.
+ */
+function verdix_ajax_migrate_batch() {
 	check_ajax_referer( 'verdix_migrate', 'nonce' );
 
 	if ( ! current_user_can( 'manage_options' ) ) {
@@ -58,38 +86,34 @@ function verdix_ajax_migrate_all() {
 
 	$source  = isset( $_POST['source'] ) ? sanitize_text_field( wp_unslash( $_POST['source'] ) ) : 'wp_review_pro';
 	$replace = ! empty( $_POST['replace'] );
+	$ids     = isset( $_POST['ids'] ) ? array_slice( array_map( 'absint', (array) wp_unslash( $_POST['ids'] ) ), 0, 50 ) : array();
 
-	$sources = verdix_get_migration_sources();
-	if ( ! isset( $sources[ $source ] ) ) {
+	if ( ! isset( verdix_get_migration_sources()[ $source ] ) ) {
 		wp_send_json_error( array( 'message' => __( 'Unknown source.', 'verdix-reviews' ) ) );
 	}
-	$posts = call_user_func( $sources[ $source ]['detect'] );
 
 	$migrated = 0;
 	$errors   = array();
 
-	foreach ( $posts as $post ) {
-		$result = verdix_migrate_post( $post->ID, $source, $replace );
+	foreach ( $ids as $post_id ) {
+		$result = verdix_migrate_post( $post_id, $source, $replace );
 		if ( is_wp_error( $result ) ) {
-			$errors[] = sprintf( '%s: %s', get_the_title( $post->ID ), $result->get_error_message() );
+			$errors[] = sprintf( '%s: %s', get_the_title( $post_id ), $result->get_error_message() );
 		} else {
 			$migrated++;
 		}
 	}
 
+	delete_transient( 'verdix_migratable_count' );
+
 	wp_send_json_success(
 		array(
 			'migrated' => $migrated,
 			'errors'   => $errors,
-			'message'  => sprintf(
-				/* translators: %d: number of posts migrated */
-				__( 'Migration complete. %d posts migrated.', 'verdix-reviews' ),
-				$migrated
-			),
 		)
 	);
 }
-add_action( 'wp_ajax_verdix_migrate_all', 'verdix_ajax_migrate_all' );
+add_action( 'wp_ajax_verdix_migrate_batch', 'verdix_ajax_migrate_batch' );
 
 // =========================================================================
 // Migration: WP Review Pro
@@ -131,13 +155,8 @@ function verdix_migrate_post_wp_review_pro( $post_id ) {
 		return new WP_Error( 'no_review', __( 'No WP Review Pro data found.', 'verdix-reviews' ) );
 	}
 
-	// Already migrated?
-	$existing = get_post_meta( $post_id, '_verdix_review', true );
-	if ( ! empty( $existing ) ) {
-		$existing_data = json_decode( $existing, true );
-		if ( is_array( $existing_data ) && ! empty( $existing_data['rating'] ) ) {
-			return new WP_Error( 'already_migrated', __( 'Already has Verdix Reviews data.', 'verdix-reviews' ) );
-		}
+	if ( verdix_post_has_verdix_data( $post_id ) ) {
+		return new WP_Error( 'already_migrated', __( 'Already has Verdix Reviews data.', 'verdix-reviews' ) );
 	}
 
 	// Read WP Review Pro meta.
@@ -405,8 +424,13 @@ function verdix_migration_enqueue( $hook_suffix ) {
 				'migrating'  => __( 'Migrating...', 'verdix-reviews' ),
 				'migrated'   => __( 'Migrated', 'verdix-reviews' ),
 				'error'      => __( 'Error', 'verdix-reviews' ),
-				'confirmAll' => __( 'Migrate all posts? This cannot be undone.', 'verdix-reviews' ),
-				'retry'      => __( 'Retry Migration', 'verdix-reviews' ),
+				'confirmAll' => __( 'Migrate all posts?', 'verdix-reviews' ),
+				'confirmReplace' => __( 'Migrate all posts and replace the source blocks in their content? The replacement cannot be undone.', 'verdix-reviews' ),
+				/* translators: 1: posts migrated so far, 2: total posts */
+				'progress'   => __( 'Migrated %1$s of %2$s posts...', 'verdix-reviews' ),
+				/* translators: %s: number of posts migrated */
+				'done'       => __( 'Migration complete. %s posts migrated.', 'verdix-reviews' ),
+				'retry'      => __( 'Retry migration', 'verdix-reviews' ),
 				'saved'      => __( 'Saved', 'verdix-reviews' ),
 			),
 		)

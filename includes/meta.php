@@ -5,9 +5,7 @@ defined( 'ABSPATH' ) || exit;
  * Register the _verdix_review meta key for the REST API and block editor.
  */
 function verdix_register_meta() {
-	$post_types = apply_filters( 'verdix_post_types', array( 'post', 'page' ) );
-
-	foreach ( $post_types as $post_type ) {
+	foreach ( verdix_get_post_types() as $post_type ) {
 		register_post_meta(
 			$post_type,
 			'_verdix_review',
@@ -15,15 +13,94 @@ function verdix_register_meta() {
 				'type'              => 'string',
 				'single'            => true,
 				'show_in_rest'      => true,
-				'auth_callback'     => function () {
-					return current_user_can( 'edit_posts' );
+				'auth_callback'     => function ( $allowed, $meta_key, $post_id ) {
+					return current_user_can( 'edit_post', $post_id );
 				},
 				'sanitize_callback' => 'verdix_sanitize_meta',
 			)
 		);
+		add_filter( "rest_prepare_{$post_type}", 'verdix_rest_hide_protected_review', 10, 2 );
 	}
 }
 add_action( 'init', 'verdix_register_meta' );
+
+function verdix_rest_hide_protected_review( $response, $post ) {
+	if ( ! verdix_can_view_review( $post ) && isset( $response->data['meta']['_verdix_review'] ) ) {
+		$response->data['meta']['_verdix_review'] = '';
+	}
+	return $response;
+}
+
+function verdix_upgrade_post_types() {
+	if ( get_option( 'verdix_post_types_synced' ) ) {
+		return;
+	}
+
+	global $wpdb;
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$reviewed = $wpdb->get_col(
+		$wpdb->prepare(
+			"SELECT DISTINCT p.post_type FROM {$wpdb->posts} p INNER JOIN {$wpdb->postmeta} pm ON pm.post_id = p.ID WHERE pm.meta_key = %s AND pm.meta_value != %s",
+			'_verdix_review',
+			''
+		)
+	);
+
+	$options = get_option( 'verdix_settings', array() );
+	if ( ! is_array( $options ) ) {
+		$options = array();
+	}
+	$current = isset( $options['post_types'] ) && is_array( $options['post_types'] ) ? $options['post_types'] : array( 'post', 'page' );
+	$merged  = array_values( array_unique( array_merge( $current, $reviewed ) ) );
+
+	if ( $merged !== $current ) {
+		$options['post_types'] = $merged;
+		update_option( 'verdix_settings', $options );
+	}
+
+	update_option( 'verdix_post_types_synced', 1 );
+}
+add_action( 'init', 'verdix_upgrade_post_types', 1 );
+
+function verdix_get_post_types() {
+	$options = get_option( 'verdix_settings', array() );
+	$types   = isset( $options['post_types'] ) && is_array( $options['post_types'] ) ? $options['post_types'] : array( 'post', 'page' );
+
+	return apply_filters( 'verdix_post_types', $types );
+}
+
+function verdix_can_view_review( $post ) {
+	$post = get_post( $post );
+	if ( ! $post ) {
+		return false;
+	}
+	if ( current_user_can( 'edit_post', $post->ID ) ) {
+		return true;
+	}
+	if ( post_password_required( $post ) ) {
+		return false;
+	}
+	return 'publish' === $post->post_status || current_user_can( 'read_post', $post->ID );
+}
+
+function verdix_box_is_displayed( $post, $review ) {
+	$options  = get_option( 'verdix_settings', array() );
+	$position = ! empty( $review['position'] ) ? $review['position'] : ( isset( $options['default_position'] ) ? $options['default_position'] : 'manual' );
+	$shown    = 'manual' !== $position || has_block( 'verdix/review-box', $post ) || has_shortcode( $post->post_content, 'verdix' );
+
+	return (bool) apply_filters( 'verdix_box_is_displayed', $shown, $post, $review );
+}
+
+function verdix_get_schema_review( $post_id ) {
+	$post   = get_post( $post_id );
+	$review = $post ? verdix_get_review( $post->ID ) : null;
+
+	if ( ! $review || empty( $review['rating'] ) || ! verdix_can_view_review( $post ) || ! verdix_box_is_displayed( $post, $review ) ) {
+		return null;
+	}
+
+	return $review;
+}
 
 /**
  * Sanitize the _verdix_review meta value.
@@ -161,6 +238,13 @@ function verdix_sanitize_data( $data ) {
 		$clean['product_name'] = sanitize_text_field( $data['product_name'] );
 	}
 
+	foreach ( array( 'brand', 'sku', 'mpn' ) as $identifier ) {
+		$clean[ $identifier ] = isset( $data[ $identifier ] ) ? sanitize_text_field( $data[ $identifier ] ) : '';
+	}
+
+	$gtin          = isset( $data['gtin'] ) ? preg_replace( '/\D/', '', (string) $data['gtin'] ) : '';
+	$clean['gtin'] = in_array( strlen( $gtin ), array( 8, 12, 13, 14 ), true ) ? $gtin : '';
+
 	$clean['price'] = '';
 	if ( isset( $data['price'] ) ) {
 		$clean['price'] = sanitize_text_field( $data['price'] );
@@ -168,7 +252,7 @@ function verdix_sanitize_data( $data ) {
 
 	$clean['currency'] = 'USD';
 	if ( isset( $data['currency'] ) ) {
-		$clean['currency'] = sanitize_text_field( $data['currency'] );
+		$clean['currency'] = verdix_sanitize_currency( $data['currency'] );
 	}
 
 	$clean['cta_text'] = '';
@@ -233,15 +317,33 @@ function verdix_get_review( $post_id ) {
  */
 function verdix_save_review( $post_id, $data ) {
 	$clean  = verdix_sanitize_data( $data );
-	$result = update_post_meta( $post_id, '_verdix_review', wp_json_encode( $clean ) );
-
-	// Companion meta in 0-5 scale so the admin Rating column can sort numerically.
-	$rating_type = ! empty( $clean['rating_type'] ) ? $clean['rating_type'] : 'star';
-	$rating_sort = verdix_normalize_to_star_scale( $clean['rating'], $rating_type );
-	update_post_meta( $post_id, '_verdix_rating_sort', $rating_sort );
-
-	return $result;
+	return update_post_meta( $post_id, '_verdix_review', wp_slash( wp_json_encode( $clean ) ) );
 }
+
+// Companion meta in 0-5 scale so the admin Rating column and review lists can sort numerically.
+function verdix_sync_rating_sort( $meta_id, $post_id, $meta_key ) {
+	if ( '_verdix_review' !== $meta_key ) {
+		return;
+	}
+
+	$review = verdix_get_review( $post_id );
+	if ( ! $review || empty( $review['rating'] ) ) {
+		delete_post_meta( $post_id, '_verdix_rating_sort' );
+		return;
+	}
+
+	$rating_type = ! empty( $review['rating_type'] ) ? $review['rating_type'] : 'star';
+	update_post_meta( $post_id, '_verdix_rating_sort', verdix_normalize_to_star_scale( $review['rating'], $rating_type ) );
+}
+add_action( 'added_post_meta', 'verdix_sync_rating_sort', 10, 3 );
+add_action( 'updated_post_meta', 'verdix_sync_rating_sort', 10, 3 );
+
+function verdix_clear_rating_sort( $meta_ids, $post_id, $meta_key ) {
+	if ( '_verdix_review' === $meta_key ) {
+		delete_post_meta( $post_id, '_verdix_rating_sort' );
+	}
+}
+add_action( 'deleted_post_meta', 'verdix_clear_rating_sort', 10, 3 );
 
 /**
  * Merge partial review fields into the saved review and save through the sanitizer.
@@ -278,6 +380,10 @@ function verdix_get_defaults() {
 		'cons'         => array(),
 		'schema_type'  => isset( $options['default_schema_type'] ) ? $options['default_schema_type'] : 'Product',
 		'product_name' => '',
+		'brand'        => '',
+		'sku'          => '',
+		'gtin'         => '',
+		'mpn'          => '',
 		'price'        => '',
 		'currency'     => 'USD',
 		'cta_text'     => '',

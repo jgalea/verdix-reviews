@@ -17,10 +17,7 @@ function verdix_register_rest_routes() {
 					if ( ! $post ) {
 						return true; // Let the callback return 404.
 					}
-					if ( 'publish' === $post->post_status ) {
-						return true;
-					}
-					return current_user_can( 'read_post', $post->ID );
+					return verdix_can_view_review( $post );
 				},
 				'args'                => array(
 					'id' => array(

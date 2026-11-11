@@ -89,6 +89,8 @@ function verdix_sanitize_offers( $offers ) {
 			'url'         => isset( $offer['url'] ) ? esc_url_raw( $offer['url'] ) : '',
 			'cta_text'    => isset( $offer['cta_text'] ) ? sanitize_text_field( $offer['cta_text'] ) : '',
 			'katina_link' => isset( $offer['katina_link'] ) ? absint( $offer['katina_link'] ) : 0,
+			'availability' => isset( $offer['availability'], verdix_get_availability_options()[ $offer['availability'] ] ) ? $offer['availability'] : '',
+			'price_valid_until' => verdix_sanitize_last_tested( isset( $offer['price_valid_until'] ) ? $offer['price_valid_until'] : '' ),
 		);
 
 		if ( '' === $item['merchant'] && '' === $item['price'] && '' === $item['url'] && ! $item['katina_link'] ) {
@@ -99,6 +101,16 @@ function verdix_sanitize_offers( $offers ) {
 	}
 
 	return $clean;
+}
+
+function verdix_get_availability_options() {
+	return array(
+		'InStock'            => __( 'In stock', 'verdix-reviews' ),
+		'OutOfStock'         => __( 'Out of stock', 'verdix-reviews' ),
+		'PreOrder'           => __( 'Pre-order', 'verdix-reviews' ),
+		'BackOrder'          => __( 'Back-order', 'verdix-reviews' ),
+		'LimitedAvailability' => __( 'Limited availability', 'verdix-reviews' ),
+	);
 }
 
 function verdix_get_katina_url( $link_id ) {

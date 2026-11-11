@@ -10,7 +10,7 @@ function verdix_add_meta_box() {
 		return;
 	}
 
-	$post_types = apply_filters( 'verdix_post_types', array( 'post', 'page' ) );
+	$post_types = verdix_get_post_types();
 
 	foreach ( $post_types as $post_type ) {
 		add_meta_box(
@@ -60,17 +60,25 @@ function verdix_meta_box_offer_row( $index, $offer, $katina_links ) {
 	$currencies = array_unique( array( 'USD', 'EUR', 'GBP', $offer['currency'] ) );
 	?>
 	<div class="verdix-offer">
-		<input type="text" name="<?php echo esc_attr( $name ); ?>[merchant]" value="<?php echo esc_attr( $offer['merchant'] ); ?>" placeholder="<?php esc_attr_e( 'Merchant', 'verdix-reviews' ); ?>">
-		<input type="text" name="<?php echo esc_attr( $name ); ?>[price]" value="<?php echo esc_attr( $offer['price'] ); ?>" class="verdix-offer__price" placeholder="<?php esc_attr_e( 'Price', 'verdix-reviews' ); ?>">
-		<select name="<?php echo esc_attr( $name ); ?>[currency]">
+		<input type="text" name="<?php echo esc_attr( $name ); ?>[merchant]" value="<?php echo esc_attr( $offer['merchant'] ); ?>" placeholder="<?php esc_attr_e( 'Merchant', 'verdix-reviews' ); ?>" aria-label="<?php esc_attr_e( 'Merchant', 'verdix-reviews' ); ?>">
+		<input type="text" name="<?php echo esc_attr( $name ); ?>[price]" value="<?php echo esc_attr( $offer['price'] ); ?>" class="verdix-offer__price" placeholder="<?php esc_attr_e( 'Price', 'verdix-reviews' ); ?>" aria-label="<?php esc_attr_e( 'Price', 'verdix-reviews' ); ?>">
+		<select name="<?php echo esc_attr( $name ); ?>[currency]" aria-label="<?php esc_attr_e( 'Currency', 'verdix-reviews' ); ?>">
 			<?php foreach ( $currencies as $code ) : ?>
 				<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $offer['currency'], $code ); ?>><?php echo esc_html( $code ); ?></option>
 			<?php endforeach; ?>
 		</select>
-		<input type="text" name="<?php echo esc_attr( $name ); ?>[cta_text]" value="<?php echo esc_attr( $offer['cta_text'] ); ?>" placeholder="<?php esc_attr_e( 'Button text', 'verdix-reviews' ); ?>">
-		<input type="url" name="<?php echo esc_attr( $name ); ?>[url]" value="<?php echo esc_url( $offer['url'] ); ?>" class="verdix-offer__url" placeholder="https://">
+		<input type="text" name="<?php echo esc_attr( $name ); ?>[cta_text]" value="<?php echo esc_attr( $offer['cta_text'] ); ?>" placeholder="<?php esc_attr_e( 'Button text', 'verdix-reviews' ); ?>" aria-label="<?php esc_attr_e( 'Button text', 'verdix-reviews' ); ?>">
+		<input type="url" name="<?php echo esc_attr( $name ); ?>[url]" value="<?php echo esc_url( $offer['url'] ); ?>" class="verdix-offer__url" placeholder="https://" aria-label="<?php esc_attr_e( 'Offer URL', 'verdix-reviews' ); ?>">
+		<select name="<?php echo esc_attr( $name ); ?>[availability]" aria-label="<?php esc_attr_e( 'Availability', 'verdix-reviews' ); ?>">
+			<option value=""><?php esc_html_e( 'Availability: in stock', 'verdix-reviews' ); ?></option>
+			<?php foreach ( verdix_get_availability_options() as $availability_value => $availability_label ) : ?>
+				<?php if ( 'InStock' === $availability_value ) { continue; } ?>
+				<option value="<?php echo esc_attr( $availability_value ); ?>" <?php selected( $offer['availability'], $availability_value ); ?>><?php echo esc_html( $availability_label ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<input type="date" name="<?php echo esc_attr( $name ); ?>[price_valid_until]" value="<?php echo esc_attr( $offer['price_valid_until'] ); ?>" aria-label="<?php esc_attr_e( 'Price valid until', 'verdix-reviews' ); ?>" title="<?php esc_attr_e( 'Price valid until', 'verdix-reviews' ); ?>">
 		<?php if ( $katina_links ) : ?>
-			<select name="<?php echo esc_attr( $name ); ?>[katina_link]" class="verdix-offer__katina">
+			<select name="<?php echo esc_attr( $name ); ?>[katina_link]" class="verdix-offer__katina" aria-label="<?php esc_attr_e( 'Katina link', 'verdix-reviews' ); ?>">
 				<option value="0"><?php esc_html_e( 'No Katina link', 'verdix-reviews' ); ?></option>
 				<?php foreach ( $katina_links as $link ) : ?>
 					<option value="<?php echo esc_attr( $link->ID ); ?>" <?php selected( (int) $offer['katina_link'], $link->ID ); ?>><?php echo esc_html( $link->post_title ); ?></option>
@@ -120,6 +128,10 @@ function verdix_save_meta_box( $post_id ) {
 		'summary'      => isset( $_POST['verdix_review_summary'] ) ? sanitize_textarea_field( wp_unslash( $_POST['verdix_review_summary'] ) ) : '',
 		'schema_type'  => isset( $_POST['verdix_review_schema_type'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_schema_type'] ) ) : 'Product',
 		'product_name' => isset( $_POST['verdix_review_product_name'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_product_name'] ) ) : '',
+		'brand'        => isset( $_POST['verdix_review_brand'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_brand'] ) ) : '',
+		'sku'          => isset( $_POST['verdix_review_sku'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_sku'] ) ) : '',
+		'gtin'         => isset( $_POST['verdix_review_gtin'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_gtin'] ) ) : '',
+		'mpn'          => isset( $_POST['verdix_review_mpn'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_mpn'] ) ) : '',
 		'price'        => isset( $_POST['verdix_review_price'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_price'] ) ) : '',
 		'currency'     => isset( $_POST['verdix_review_currency'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_currency'] ) ) : 'USD',
 		'cta_text'     => isset( $_POST['verdix_review_cta_text'] ) ? sanitize_text_field( wp_unslash( $_POST['verdix_review_cta_text'] ) ) : '',

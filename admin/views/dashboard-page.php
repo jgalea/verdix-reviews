@@ -3,18 +3,28 @@ defined( 'ABSPATH' ) || exit;
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- File is included inside a class method; variables are function-scoped, not global.
 
-$options    = get_option( 'verdix_settings', array() );
-$post_types = apply_filters( 'verdix_post_types', isset( $options['post_types'] ) ? $options['post_types'] : array( 'post', 'page' ) );
-// Count reviewed posts.
 global $wpdb;
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-$total_reviews = (int) $wpdb->get_var(
+$totals = $wpdb->get_row(
 	$wpdb->prepare(
-		"SELECT COUNT(DISTINCT post_id) FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value != %s",
+		"SELECT COUNT(DISTINCT pm.post_id) AS total, AVG(NULLIF(CAST(rs.meta_value AS DECIMAL(4,2)), 0)) AS average
+		FROM {$wpdb->postmeta} pm
+		INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+		LEFT JOIN {$wpdb->postmeta} rs ON rs.post_id = pm.post_id AND rs.meta_key = %s
+		WHERE pm.meta_key = %s
+		AND pm.meta_value != %s
+		AND p.post_status IN (%s, %s, %s, %s)",
+		'_verdix_rating_sort',
 		'_verdix_review',
-		''
+		'',
+		'publish',
+		'draft',
+		'pending',
+		'private'
 	)
 );
+$total_reviews = $totals ? (int) $totals->total : 0;
+$avg_rating    = $totals && null !== $totals->average ? round( (float) $totals->average, 1 ) : 0;
 
 // Get recent reviews.
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -37,32 +47,6 @@ $recent_ids = $wpdb->get_col(
 		10
 	)
 );
-
-// Calculate average rating.
-$avg_rating = 0;
-$rating_count = 0;
-if ( $total_reviews > 0 ) {
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-	$all_meta = $wpdb->get_col(
-		$wpdb->prepare(
-			"SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value != %s",
-			'_verdix_review',
-			''
-		)
-	);
-	$sum = 0;
-	foreach ( $all_meta as $raw ) {
-		$data = json_decode( $raw, true );
-		if ( is_array( $data ) && ! empty( $data['rating'] ) ) {
-			$type = ! empty( $data['rating_type'] ) ? $data['rating_type'] : 'star';
-			$sum += verdix_normalize_to_star_scale( $data['rating'], $type );
-			$rating_count++;
-		}
-	}
-	if ( $rating_count > 0 ) {
-		$avg_rating = round( $sum / $rating_count, 1 );
-	}
-}
 
 // Count migratable posts across all registered migration sources (WP Review Pro + Pro sources).
 $wp_review_count = verdix_count_all_migratable();
@@ -96,7 +80,7 @@ if ( ! empty( $recent_ids ) ) {
 				<div class="verdix-stat-card__icon dashicons dashicons-edit"></div>
 				<div class="verdix-stat-card__content">
 					<span class="verdix-stat-card__value"><?php echo esc_html( $total_reviews ); ?></span>
-					<span class="verdix-stat-card__label"><?php esc_html_e( 'Total Reviews', 'verdix-reviews' ); ?></span>
+					<span class="verdix-stat-card__label"><?php esc_html_e( 'Total reviews', 'verdix-reviews' ); ?></span>
 				</div>
 			</div>
 
@@ -104,7 +88,7 @@ if ( ! empty( $recent_ids ) ) {
 				<div class="verdix-stat-card__icon dashicons dashicons-star-filled"></div>
 				<div class="verdix-stat-card__content">
 					<span class="verdix-stat-card__value"><?php echo esc_html( $avg_rating ); ?><small>/5</small></span>
-					<span class="verdix-stat-card__label"><?php esc_html_e( 'Average Rating', 'verdix-reviews' ); ?></span>
+					<span class="verdix-stat-card__label"><?php esc_html_e( 'Average rating', 'verdix-reviews' ); ?></span>
 				</div>
 			</div>
 
@@ -115,10 +99,10 @@ if ( ! empty( $recent_ids ) ) {
 					<span class="verdix-stat-card__label">
 						<?php if ( $wp_review_count > 0 ) : ?>
 							<a href="<?php echo esc_url( admin_url( 'admin.php?page=verdix-migration' ) ); ?>">
-								<?php esc_html_e( 'Ready to Migrate', 'verdix-reviews' ); ?>
+								<?php esc_html_e( 'Ready to migrate', 'verdix-reviews' ); ?>
 							</a>
 						<?php else : ?>
-							<?php esc_html_e( 'Ready to Migrate', 'verdix-reviews' ); ?>
+							<?php esc_html_e( 'Ready to migrate', 'verdix-reviews' ); ?>
 						<?php endif; ?>
 					</span>
 				</div>
@@ -128,7 +112,7 @@ if ( ! empty( $recent_ids ) ) {
 				<div class="verdix-stat-card__icon dashicons dashicons-clock"></div>
 				<div class="verdix-stat-card__content">
 					<span class="verdix-stat-card__value"><?php echo esc_html( $latest_review_label ); ?></span>
-					<span class="verdix-stat-card__label"><?php esc_html_e( 'Latest Review', 'verdix-reviews' ); ?></span>
+					<span class="verdix-stat-card__label"><?php esc_html_e( 'Latest review', 'verdix-reviews' ); ?></span>
 				</div>
 			</div>
 		</div>
@@ -138,7 +122,7 @@ if ( ! empty( $recent_ids ) ) {
 			<!-- Recent reviews -->
 			<div class="verdix-panel">
 				<h2 class="verdix-panel__title">
-					<?php esc_html_e( 'Recent Reviews', 'verdix-reviews' ); ?>
+					<?php esc_html_e( 'Recent reviews', 'verdix-reviews' ); ?>
 					<?php if ( $total_reviews > 10 ) : ?>
 						<span class="verdix-panel__title-meta">
 							<?php
@@ -201,7 +185,7 @@ if ( ! empty( $recent_ids ) ) {
 
 			<!-- Quick links panel -->
 			<div class="verdix-panel">
-				<h2 class="verdix-panel__title"><?php esc_html_e( 'Quick Links', 'verdix-reviews' ); ?></h2>
+				<h2 class="verdix-panel__title"><?php esc_html_e( 'Quick links', 'verdix-reviews' ); ?></h2>
 				<div class="verdix-quick-links">
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=verdix-settings' ) ); ?>" class="verdix-quick-link">
 						<span class="dashicons dashicons-admin-generic"></span>
@@ -209,26 +193,30 @@ if ( ! empty( $recent_ids ) ) {
 					</a>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=verdix-migration' ) ); ?>" class="verdix-quick-link">
 						<span class="dashicons dashicons-migrate"></span>
-						<?php esc_html_e( 'Migration Tools', 'verdix-reviews' ); ?>
+						<?php esc_html_e( 'Migration tools', 'verdix-reviews' ); ?>
 						<?php if ( $wp_review_count > 0 ) : ?>
 							<span class="verdix-badge verdix-badge--count"><?php echo esc_html( $wp_review_count ); ?></span>
 						<?php endif; ?>
 					</a>
 					<a href="<?php echo esc_url( admin_url( 'post-new.php' ) ); ?>" class="verdix-quick-link">
 						<span class="dashicons dashicons-plus-alt2"></span>
-						<?php esc_html_e( 'New Review Post', 'verdix-reviews' ); ?>
+						<?php esc_html_e( 'New review post', 'verdix-reviews' ); ?>
 					</a>
 				</div>
 
 				<h3 class="verdix-panel__subtitle"><?php esc_html_e( 'Usage', 'verdix-reviews' ); ?></h3>
 				<div class="verdix-usage-hints">
 					<div class="verdix-hint">
-						<strong><?php esc_html_e( 'Block Editor', 'verdix-reviews' ); ?></strong>
+						<strong><?php esc_html_e( 'Block editor', 'verdix-reviews' ); ?></strong>
 						<p><?php esc_html_e( 'Add the "Review Box" block to any post or page.', 'verdix-reviews' ); ?></p>
 					</div>
 					<div class="verdix-hint">
 						<strong><?php esc_html_e( 'Shortcode', 'verdix-reviews' ); ?></strong>
 						<p><code>[verdix]</code> <?php esc_html_e( 'or', 'verdix-reviews' ); ?> <code>[verdix id="123"]</code></p>
+					</div>
+					<div class="verdix-hint">
+						<strong><?php esc_html_e( 'Review list', 'verdix-reviews' ); ?></strong>
+						<p><?php esc_html_e( 'Add the "Review List" block, or use', 'verdix-reviews' ); ?> <code>[verdix_list type="top-rated" count="5"]</code>. <?php esc_html_e( 'Other options: type="latest", schema_type, category and image="false".', 'verdix-reviews' ); ?></p>
 					</div>
 					<div class="verdix-hint">
 						<strong><?php esc_html_e( 'REST API', 'verdix-reviews' ); ?></strong>

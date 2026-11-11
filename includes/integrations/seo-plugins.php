@@ -90,8 +90,8 @@ function verdix_merge_into_graph( array $nodes ) {
 	}
 
 	$post_id = get_the_ID();
-	$review  = verdix_get_review( $post_id );
-	if ( ! $review || empty( $review['rating'] ) ) {
+	$review  = verdix_get_schema_review( $post_id );
+	if ( ! $review ) {
 		return $nodes;
 	}
 

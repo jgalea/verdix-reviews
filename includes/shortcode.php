@@ -35,7 +35,7 @@ function verdix_shortcode_handler( $atts ) {
 	}
 
 	$review = verdix_get_review( $post_id );
-	if ( ! $review || empty( $review['rating'] ) ) {
+	if ( ! $review || empty( $review['rating'] ) || ! verdix_can_view_review( $post_id ) ) {
 		return '';
 	}
 

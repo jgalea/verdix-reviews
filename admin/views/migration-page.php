@@ -32,7 +32,7 @@ $total_migratable = array_sum( wp_list_pluck( $detected, 'total' ) );
 	</div>
 
 	<div class="verdix-panel">
-		<h2 class="verdix-panel__title"><?php esc_html_e( 'Supported Sources', 'verdix-reviews' ); ?></h2>
+		<h2 class="verdix-panel__title"><?php esc_html_e( 'Supported sources', 'verdix-reviews' ); ?></h2>
 		<p class="description">
 			<?php esc_html_e( 'Verdix Reviews can import review data from the plugins listed below. Your site is scanned automatically; sources with matching data let you review and migrate each post before any changes are saved.', 'verdix-reviews' ); ?>
 		</p>
@@ -40,9 +40,9 @@ $total_migratable = array_sum( wp_list_pluck( $detected, 'total' ) );
 		<table class="wp-list-table widefat striped" style="margin-top: 12px;">
 			<thead>
 				<tr>
-					<th><?php esc_html_e( 'Source Plugin', 'verdix-reviews' ); ?></th>
+					<th><?php esc_html_e( 'Source plugin', 'verdix-reviews' ); ?></th>
 					<th style="width: 180px;"><?php esc_html_e( 'Status', 'verdix-reviews' ); ?></th>
-					<th style="width: 120px;"><?php esc_html_e( 'Posts Found', 'verdix-reviews' ); ?></th>
+					<th style="width: 120px;"><?php esc_html_e( 'Posts found', 'verdix-reviews' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -103,7 +103,7 @@ $total_migratable = array_sum( wp_list_pluck( $detected, 'total' ) );
 				<button type="button" class="button button-primary verdix-migrate-all-btn" data-source="<?php echo esc_attr( $source_key ); ?>">
 					<?php
 					/* translators: %d: number of posts */
-					echo esc_html( sprintf( __( 'Migrate All (%d posts)', 'verdix-reviews' ), $total ) );
+					echo esc_html( sprintf( __( 'Migrate all (%d posts)', 'verdix-reviews' ), $total ) );
 					?>
 				</button>
 			</p>
@@ -134,7 +134,7 @@ $total_migratable = array_sum( wp_list_pluck( $detected, 'total' ) );
 				<thead>
 					<tr>
 						<th style="width: 50px;"><?php esc_html_e( 'ID', 'verdix-reviews' ); ?></th>
-						<th><?php esc_html_e( 'Post Title', 'verdix-reviews' ); ?></th>
+						<th><?php esc_html_e( 'Post title', 'verdix-reviews' ); ?></th>
 						<?php foreach ( $source_config['columns'] as $col ) : ?>
 							<th style="width: 80px;"><?php echo esc_html( ucfirst( $col ) ); ?></th>
 						<?php endforeach; ?>
@@ -145,8 +145,7 @@ $total_migratable = array_sum( wp_list_pluck( $detected, 'total' ) );
 				<tbody>
 					<?php foreach ( $posts as $post ) : ?>
 						<?php
-						$existing = get_post_meta( $post->ID, '_verdix_review', true );
-						$already  = ! empty( $existing );
+						$already  = verdix_post_has_verdix_data( $post->ID );
 						$row_data = is_callable( $source_config['row_data'] ) ? call_user_func( $source_config['row_data'], $post ) : array();
 						?>
 						<tr id="verdix-migrate-row-<?php echo esc_attr( $post->ID ); ?>">
