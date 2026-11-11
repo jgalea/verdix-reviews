@@ -286,7 +286,7 @@ function verdix_get_review( $post_id ) {
  */
 function verdix_save_review( $post_id, $data ) {
 	$clean  = verdix_sanitize_data( $data );
-	$result = update_post_meta( $post_id, '_verdix_review', wp_json_encode( $clean ) );
+	$result = update_post_meta( $post_id, '_verdix_review', wp_slash( wp_json_encode( $clean ) ) );
 
 	// Companion meta in 0-5 scale so the admin Rating column can sort numerically.
 	$rating_type = ! empty( $clean['rating_type'] ) ? $clean['rating_type'] : 'star';
